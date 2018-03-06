@@ -5,6 +5,9 @@ class HomeParsing(object):
 	def __init__(self):
 		pass
 
+	def BuildLink(self,parameters,function):
+		return function(parameters)
+
 	def ExtractAnnunci(self,indirizzo,selettore,funzione):
 		pagina_vergine = urlopen(indirizzo).read()
 		pagina = pq(pagina_vergine)
