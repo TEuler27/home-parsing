@@ -1,9 +1,24 @@
 from urllib.request import urlopen
 from pyquery import PyQuery as pq
+import tkinter as tk
+from tkinter import ttk
+
 
 class HomeParsing(object):
 	def __init__(self):
-		pass
+		self.GenerateWindow()
+
+	def GenerateWindow(self):
+		top = tk.Tk()
+		frame = ttk.Frame(top)
+		frame["padding"] = (100,50)
+		frame['borderwidth'] = 2
+		frame['relief'] = 'sunken'
+		frame.pack()
+		cmb = ttk.Combobox(frame, state = 'readonly')
+		cmb['values'] = ('Vendita', 'Affitto')
+		cmb.pack()
+		top.mainloop()
 
 	def BuildLink(self,parameters,function):
 		return function(parameters)
