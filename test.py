@@ -1,7 +1,8 @@
 from urllib import request
-from zoneimmobiliare import *
+from geografiaimmobiliare import *
 import json
 
-Zone = ZoneImmobiliare()
-Zone.getProvince()
-Zone.getComuni()
+geo = GeografiaImmobiliare()
+geo.getProvince()
+geo.getComuni()
+geo.getZone()
