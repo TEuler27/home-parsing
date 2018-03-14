@@ -21,7 +21,7 @@ class HomeParsing(object):
 			modulo_l.pack()
 			regioni_l = ttk.Label(top, text="Region:", padding = [0,0,0,10], font = 'Arial 10')
 			regioni = ttk.Combobox(top, state = 'readonly')
-			regioni['values'] = modulo_py.getRegioni();
+			regioni['values'] = modulo_py.getRegioni()
 			regioni.bind("<<ComboboxSelected>>", modulo_py.getProvince)
 			province_l = ttk.Label(top, text="Provincia:", padding = [0,10,0,10], font = 'Arial 10')
 			province = ttk.Combobox(top, state = 'readonly')
