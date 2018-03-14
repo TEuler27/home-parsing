@@ -2,11 +2,9 @@ from pyquery import PyQuery as pq
 from urllib import request
 import json
 
-class GeografiaImmobiliare(object):
 
-	def __init__(self):
-		#self.geografia = {"Valle D'Aosta" : {},"Lombardia" : {},"Piemonte" : {},"Liguria" : {},"Trentino Alto-Adige" : {},"Veneto" : {},"Friuli Venezia-Giulia" : {},"Emilia Romagna" : {},"Toscana" : {},"Marche" : {},"Lazio" : {},"Umbria" : {},"Abruzzo" : {},"Molise" : {},"Basilicata" : {},"Puglia" : {},"Campania" : {},"Calabria" : {},"Sicilia" : {},"Sardegna" : {}}
-		self.geografia = {"Lombardia": {}}
+	def getRegioni():
+		return ["Valle D'Aosta","Lombardia","Piemonte","Liguria","Trentino Alto-Adige","Veneto","Friuli Venezia-Giulia","Emilia Romagna","Toscana","Marche","Lazio","Umbria","Abruzzo","Molise","Basilicata","Puglia","Campania","Calabria","Sicilia","Sardegna"]
 
 	def getProvince(self):
 		for regione in self.geografia:
