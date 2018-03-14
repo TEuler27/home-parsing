@@ -7,7 +7,7 @@ def price(oggetto):
     return oggetto.text()[2:]
 
 def sup(oggetto):
-    return oggetto.text().split(" ")[0]
+    return oggetto.eq(4)("strong").text()
 
 def geo(indirizzo):
     return upperfirst(indirizzo.text().split(",")[0])
@@ -23,37 +23,48 @@ def zone(indirizzo):
         return ""
 
 def room(parametro):
-    lista = parametro("dl.col-xs-12").text().split("\n")
-    indice = lista.index("Locali")+1
-    return lista[indice]
+    return parametro.eq(2)("strong").text()
+
+def wc(parametro):
+    return parametro.eq(3)("strong").text()
 
 def auto(parametro):
-    lista = parametro("dl.col-xs-12").text().split("\n")
-    indice = lista.index("Box e posti auto")+1
-    return lista[indice]
+    try:
+        lista = parametro("dl.col-xs-12").text().split("\n")
+        indice = lista.index("Box e posti auto")+1
+        return lista[indice]
+    except ValueError:
+        return ""
 
 def floor(parametro):
-    lista = parametro("dl.col-xs-12").text().split("\n")
-    indice = lista.index("Piano")+1
-    return lista[indice]
+    try:
+        lista = parametro("dl.col-xs-12").text().split("\n")
+        indice = lista.index("Piano")+1
+        return lista[indice]
+    except ValueError:
+        return ""
 
 def cash(parametro):
-    lista = parametro("dl.col-xs-12").text().split("\n")
-    indice = lista.index("Spese condominio")+1
-    return lista[indice]
+    try:
+        lista = parametro("dl.col-xs-12").text().split("\n")
+        indice = lista.index("Spese condominio")+1
+        elementi = lista[indice].split(" ")[1]
+        return elementi.split("/")[0]
+    except ValueError:
+        return ""
 
 def agency(nome):
     return nome.eq(0).text()
-
 
 selettori = [".maps-address > span"]
 selettori += [".maps-address > span"]
 selettori += [".maps-address > span"]
 selettori += [".features__price"]
-selettori += ["a[data-target='#consistenzeSuperficie']"]
-selettori += ["dl.col-xs-12"]
+selettori += [".list-inline > li"]
+selettori += [".list-inline > li"]
+selettori += [".list-inline > li"]
 selettori += ["dl.col-xs-12"]
 selettori += ["dl.col-xs-12"]
 selettori += ["dl.col-xs-12"]
 selettori += [".contact-data__name"]
-funzioni = [geo,country,zone,price,sup,room,auto,floor,cash,agency]
+funzioni = [geo,country,zone,price,sup,room,wc,auto,floor,cash,agency]
