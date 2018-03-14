@@ -2,6 +2,7 @@ from urllib.request import urlopen
 from pyquery import PyQuery as pq
 import tkinter as tk
 from tkinter import ttk
+from json import loads
 
 
 class HomeParsing(object):
@@ -10,13 +11,13 @@ class HomeParsing(object):
 
 	def GenerateWindow(self):
 		top = tk.Tk()
+		top.geometry("800x800")
 		frame = ttk.Frame(top)
-		frame["padding"] = (100,50)
-		frame['borderwidth'] = 2
-		frame['relief'] = 'sunken'
-		frame.pack()
-		cmb = ttk.Combobox(frame, state = 'readonly')
-		cmb['values'] = ('Vendita', 'Affitto')
+		cmb = ttk.Combobox(top, state = 'readonly')
+		moduli = json.loads(open("moduli.json").read())
+		for modulo in moduli:
+			w = Label(top, text=modulo)
+			cmb['values'] = ('Vendita', 'Affitto')
 		cmb.pack()
 		top.mainloop()
 
