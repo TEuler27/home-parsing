@@ -1,4 +1,3 @@
-#classe immobiliare con selettori e funzioni associate
 from pyquery import PyQuery
 def upperfirst(x):
     return x[0].upper() + x[1:]
@@ -56,6 +55,16 @@ def cash(parametro):
 def agency(nome):
     return nome.eq(0).text()
 
+#DA QUA ESTRAZIONE ANNUNCI
+
+def link(url):
+    lista = []
+    for a in url("a").items():
+        lista.append(a.attr("href"))
+    return lista
+
+
+
 selettori = [".maps-address > span"]
 selettori += [".maps-address > span"]
 selettori += [".maps-address > span"]
@@ -68,3 +77,5 @@ selettori += ["dl.col-xs-12"]
 selettori += ["dl.col-xs-12"]
 selettori += [".contact-data__name"]
 funzioni = [geo,country,zone,price,sup,room,wc,auto,floor,cash,agency]
+selettore = ".text-primary"
+funzione = link
