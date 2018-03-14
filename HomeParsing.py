@@ -2,7 +2,8 @@ from urllib.request import urlopen
 from pyquery import PyQuery as pq
 import tkinter as tk
 from tkinter import ttk
-from json import loads
+from importlib import import_module
+import json
 
 
 class HomeParsing(object):
@@ -11,14 +12,31 @@ class HomeParsing(object):
 
 	def GenerateWindow(self):
 		top = tk.Tk()
-		top.geometry("800x800")
+		top.geometry("400x800")
 		frame = ttk.Frame(top)
-		cmb = ttk.Combobox(top, state = 'readonly')
 		moduli = json.loads(open("moduli.json").read())
 		for modulo in moduli:
-			w = Label(top, text=modulo)
-			cmb['values'] = ('Vendita', 'Affitto')
-		cmb.pack()
+			modulo_py = import_module(modulo)
+			modulo_l = ttk.Label(top, text=modulo+":", padding=[0,10,0,10], font='Arial 15 bold')
+			modulo_l.pack()
+			regioni_l = ttk.Label(top, text="Region:", padding = [0,0,0,10], font = 'Arial 10')
+			regioni = ttk.Combobox(top, state = 'readonly')
+			regioni['values'] = modulo_py.getRegioni();
+			regioni.bind("<<ComboboxSelected>>", modulo_py.getProvince)
+			province_l = ttk.Label(top, text="Provincia:", padding = [0,10,0,10], font = 'Arial 10')
+			province = ttk.Combobox(top, state = 'readonly')
+			province['values'] = []
+			province.bind("<<ComboboxSelected>>", modulo_py.getProvince)
+			comuni_l = ttk.Label(top, text="Comune:", padding = [0,10,0,10], font = 'Arial 10')
+			comuni = ttk.Combobox(top, state = 'readonly')
+			comuni['values'] = []
+			comuni.bind("<<ComboboxSelected>>", modulo_py.getZoneLocalita)
+			regioni_l.pack()
+			regioni.pack()
+			province_l.pack()
+			province.pack()
+			comuni_l.pack()
+			comuni.pack()
 		top.mainloop()
 
 	def BuildLink(self,parameters,function):
