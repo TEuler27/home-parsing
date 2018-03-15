@@ -6,7 +6,8 @@ def price(oggetto):
     return oggetto.text()[2:]
 
 def sup(oggetto):
-    return oggetto.eq(4)("strong").text()
+    numeri = len(oggetto("strong"))
+    return oggetto("strong").eq(numeri-1).text()
 
 def geo(indirizzo):
     return upperfirst(indirizzo.text().split(",")[0])
@@ -22,10 +23,12 @@ def zone(indirizzo):
         return ""
 
 def room(parametro):
-    return parametro.eq(2)("strong").text()
+    numeri = len(parametro("strong"))
+    return parametro("strong").eq(-3).text()
 
 def wc(parametro):
-    return parametro.eq(3)("strong").text()
+    numeri = len(parametro("strong"))
+    return parametro("strong").eq(-2).text()
 
 def auto(parametro):
     try:
@@ -64,14 +67,36 @@ def link(url):
     return lista
 
 
+def next(pagina,indirizzo):
+    bottone = pagina(".pull-right")("li")
+    if bottone("a").eq(0).hasClass("disabled"):
+        return False
+    else:
+        if "pag=" in indirizzo:
+            this = indirizzo.split("=")
+            this[-1] = int(this[-1])+1
+            this[-1] = str(this[-1])
+            return "=".join(this)
+
+        else:
+            return indirizzo+"&pag=2"
+
+
+
+
+
+
+
+
+
 
 selettori = [".maps-address > span"]
 selettori += [".maps-address > span"]
 selettori += [".maps-address > span"]
 selettori += [".features__price"]
-selettori += [".list-inline > li"]
-selettori += [".list-inline > li"]
-selettori += [".list-inline > li"]
+selettori += [".block__features-anction > .feature-action__features"]
+selettori += [".block__features-anction > .feature-action__features"]
+selettori += [".block__features-anction > .feature-action__features"]
 selettori += ["dl.col-xs-12"]
 selettori += ["dl.col-xs-12"]
 selettori += ["dl.col-xs-12"]
