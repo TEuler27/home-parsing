@@ -14,7 +14,7 @@ class Immobiliare:
 		self.zone = {}
 		self.localita = []
 
-	def getProvince(self,event):
+	def getProvince(self,event,combobox):
 		self.regione = event.widget.get()
 		json_data = json.loads(request.urlopen("https://www.immobiliare.it/servicesV6/mapchart/cartineMapArea/regioni/"+self.regione.lower()[:3]+".json").read().decode('utf8'))
 		self.province = {}
@@ -23,9 +23,9 @@ class Immobiliare:
 			if provincia["indexArea"] == 0:
 				self.province[provincia["nome"]] = provincia["idProvincia"]
 				province += [provincia["nome"]]
-		return province
+		combobox['value'] = province
 
-	def getComuni(self,event):
+	def getComuni(self,event,combobox):
 		self.provincia = event.widget.get()
 		sigla = self.province[self.provincia]
 		header ={"referer":"https://www.immobiliare.it/"}
@@ -36,9 +36,9 @@ class Immobiliare:
 		for comune in json_data["result"]:
 			self.comuni[comune["nome"]] = {"idComune": comune["idComune"], "conZone": comune["conZone"], "conLocalita": comune["conLocalita"], "keyurl": comune["keyurl"]}
 			comuni += [comune["nome"]]
-		return comuni
+		combobox["value"] = comuni
 
-	def getZoneLocalita(self,event):
+	def getZoneLocalita(self,event,combobox):
 		self.comune = event.widget.get()
 		if self.comuni[self.comune]["conZone"]:
 			idComune = self.comuni[comune]["idComune"]
@@ -50,10 +50,23 @@ class Immobiliare:
 			for idZona in json_data["result"]:
 				self.zone[json_data["result"][idZona]['macrozona_nome_sn']] = json_data["result"][idZona]['macrozona_keyurl']
 				zone += [json_data["result"][idZona]['macrozona_nome_sn']]
-			return zone
-		if self.comuni[self.comune]["conLocalita"]:
+			combobox["value"] = zone
+		"""if self.comuni[self.comune]["conLocalita"]:
 			pagina = pq(request.urlopen("https://www.immobiliare.it/vendita-case/"+self.comuni[self.comune]["keyurl"].lower().replace("_","-")).read().decode("utf8"))
 			self.localita = []
 			for localita in pagina(".breadcrumb-list").items("a"):
 				self.localita += [localita.text()]
-			return self.localita
+			combobox["value"] = self.localita"""
+
+	def BuildLink(self,ven_aff,provincia,comune,zona):
+		link = "https://www.immobiliare.it/"
+		if ven_aff == 0:
+			link += "vendita-case/"
+		else:
+			link += "affitto-case/"
+		if comune != "":
+			link += comune.lower()+"/"
+			if zona != "":
+				link += self.zone[zona]+"/"
+			return link
+		return link+provincia.lower().replace(" ","-")+"-provincia/"
