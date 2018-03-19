@@ -2,7 +2,91 @@ from pyquery import PyQuery as pq
 from urllib import request
 from tkinter import ttk
 import json
+import time
 from HomeParsing import *
+
+def upperfirst(x):
+	return x[0].upper() + x[1:]
+
+def price(oggetto):
+	return oggetto.text()[2:]
+
+def sup(oggetto):
+	numeri = len(oggetto("strong"))
+	return oggetto("strong").eq(numeri-1).text()
+
+def geo(indirizzo):
+	return upperfirst(indirizzo.text().split(",")[0])
+
+def country(indirizzo):
+	return indirizzo.text().split(",")[-1].split("-")[0]
+
+def zone(indirizzo):
+	zona = indirizzo.text().split(",")[-1].split("-")
+	if len(zona)==2:
+		return zona[1]
+	else:
+		return ""
+
+def room(parametro):
+	numeri = len(parametro("strong"))
+	return parametro("strong").eq(-3).text()
+
+def wc(parametro):
+	numeri = len(parametro("strong"))
+	return parametro("strong").eq(-2).text()
+
+def auto(parametro):
+	try:
+		lista = parametro("dl.col-xs-12").text().split("\n")
+		indice = lista.index("Box e posti auto")+1
+		return lista[indice]
+	except ValueError:
+		return ""
+
+def floor(parametro):
+	try:
+		lista = parametro("dl.col-xs-12").text().split("\n")
+		indice = lista.index("Piano")+1
+		return lista[indice]
+	except ValueError:
+		return ""
+
+def cash(parametro):
+	try:
+		lista = parametro("dl.col-xs-12").text().split("\n")
+		indice = lista.index("Spese condominio")+1
+		elementi = lista[indice].split(" ")[1]
+		return elementi.split("/")[0]
+	except ValueError:
+		return ""
+
+def agency(nome):
+	return nome.eq(0).text()
+
+#DA QUA ESTRAZIONE ANNUNCI
+
+def links(url):
+	lista = []
+	for a in url("a").items():
+		lista.append(a.attr("href"))
+	return lista
+
+
+def nextPage(pagina,indirizzo):
+	bottone = pagina(".pull-right")("li")
+	if bottone("a").eq(0).hasClass("disabled"):
+		return False
+	else:
+		if "pag=" in indirizzo:
+			this = indirizzo.split("=")
+			this[-1] = int(this[-1])+1
+			this[-1] = str(this[-1])
+			return "=".join(this)
+
+		else:
+			return indirizzo+"&pag=2"
+
 
 class Immobiliare:
 
@@ -16,6 +100,20 @@ class Immobiliare:
 		self.zona = ""
 		self.zone = {}
 		self.localita = []
+		self.selettori = [".maps-address > span"]
+		self.selettori += [".maps-address > span"]
+		self.selettori += [".maps-address > span"]
+		self.selettori += [".features__price"]
+		self.selettori += [".block__features-anction > .feature-action__features"]
+		self.selettori += [".block__features-anction > .feature-action__features"]
+		self.selettori += [".block__features-anction > .feature-action__features"]
+		self.selettori += ["dl.col-xs-12"]
+		self.selettori += ["dl.col-xs-12"]
+		self.selettori += ["dl.col-xs-12"]
+		self.selettori += [".contact-data__name"]
+		self.funzioni = [geo,country,zone,price,sup,room,wc,auto,floor,cash,agency]
+		self.selettore = ".text-primary"
+		self.funzione = links
 
 	def GenerateWindow(self):
 		frame = ttk.Frame(width="200", height="200")
@@ -43,6 +141,8 @@ class Immobiliare:
 			self.zona = event.widget.get()
 		self.zone_localita_c.bind("<<ComboboxSelected>>", save_zona)
 		frame.pack()
+		ven_aff_l.pack()
+		self.ven_aff.pack()
 		regioni_l.pack()
 		self.regioni_c.pack()
 		province_l.pack()
@@ -57,9 +157,10 @@ class Immobiliare:
 
 	def Magia(self):
 		link = self.BuildLink(self.ven_aff.get(),self.provincia,self.comune,self.zona)
-		lista = HomeParsing.ExtractAnnunci(link,selettore,funzione,next)
+		Hp = HomeParsing(1)
+		lista = Hp.ExtractAnnunci(link,self.selettore,self.funzione,nextPage)
 		for url in lista:
-			HomeParsing.ExtractData(url,"Immobiliare"+time.strftime("%d/%m")+".csv",selettori,funzioni)
+			Hp.ExtractData(url,"Immobiliare-"+time.strftime("%d-%m")+".csv",self.selettori,self.funzioni)
 
 	def getProvince(self,event):
 		self.regione = event.widget.get()
@@ -115,5 +216,5 @@ class Immobiliare:
 			link += comune.lower()+"/"
 			if zona != "":
 				link += self.zone[zona]+"/"
-			return link
-		return link+provincia.lower().replace(" ","-")+"-provincia/"
+			return link+"?criterio=rilevanza"
+		return link+provincia.lower().replace(" ","-")+"-provincia/?criterio=rilevanza"

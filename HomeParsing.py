@@ -7,19 +7,20 @@ import functools
 
 
 class HomeParsing(object):
-	def __init__(self):
-		self.GenerateWindow()
+	def __init__(self, new = 0):
+		self.GenerateWindow(new)
 
-	def GenerateWindow(self):
-		root = tk.Tk()
-		root.geometry("800x800")
-		moduli = json.loads(open("moduli.json").read())
-		for modulo in moduli:
+	def GenerateWindow(self,new):
+		if new == 0:
+			root = tk.Tk()
+			root.geometry("800x800")
+			moduli = json.loads(open("moduli.json").read())
+			for modulo in moduli:
 
-			modulo_py = getattr(import_module(modulo.lower()), modulo)
-			classe = modulo_py()
-			classe.GenerateWindow()
-		root.mainloop()
+				modulo_py = getattr(import_module(modulo.lower()), modulo)
+				classe = modulo_py()
+				classe.GenerateWindow()
+			root.mainloop()
 
 	def ExtractAnnunci(self,indirizzo,selettore,funzione,next):
 		pagina_vergine = urlopen(indirizzo).read()
@@ -27,11 +28,15 @@ class HomeParsing(object):
 		oggetto = pagina(selettore)
 		lista = funzione(oggetto)
 		while next(pagina,indirizzo) != False:
-			indirizzo = next(pagina,indirizzo)
-			pagina_vergine = urlopen(indirizzo).read()
-			pagina = pq(pagina_vergine)
-			oggetto = pagina(selettore)
-			lista += funzione(oggetto)
+			try:
+				print(indirizzo)
+				indirizzo = next(pagina,indirizzo)
+				pagina_vergine = urlopen(indirizzo).read()
+				pagina = pq(pagina_vergine)
+				oggetto = pagina(selettore)
+				lista += funzione(oggetto)
+			except:
+				print(indirizzo)
 		oggetto = pagina(selettore)
 		lista += funzione(oggetto)
 		return lista
@@ -40,6 +45,7 @@ class HomeParsing(object):
 		pagina_vergine = urlopen(indirizzo).read()
 		pagina = pq(pagina_vergine)
 		dati = ""
+		print(indirizzo)
 		for i in range(len(selettori)):
 			oggetto = pagina(selettori[i])
 			dato = funzioni[i](oggetto)
