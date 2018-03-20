@@ -1,9 +1,12 @@
 from pyquery import PyQuery as pq
 from urllib import request
 from tkinter import ttk
+import tkinter as tk
+from tkinter import messagebox
 import json
 import time
 from HomeParsing import *
+import threading
 
 def upperfirst(x):
 	return x[0].upper() + x[1:]
@@ -90,7 +93,8 @@ def nextPage(pagina,indirizzo):
 
 class Immobiliare:
 
-	def __init__(self):
+	def __init__(self,root):
+		self.root = root
 		self.regioni = ["Valle D'Aosta","Lombardia","Piemonte","Liguria","Trentino Alto-Adige","Veneto","Friuli Venezia-Giulia","Emilia Romagna","Toscana","Marche","Lazio","Umbria","Abruzzo","Molise","Basilicata","Puglia","Campania","Calabria","Sicilia","Sardegna"]
 		self.regione = ""
 		self.provincia = ""
@@ -99,6 +103,7 @@ class Immobiliare:
 		self.comuni = {}
 		self.zona = ""
 		self.zone = {}
+		self.ven_aff = ""
 		self.localita = []
 		self.selettori = [".maps-address > span"]
 		self.selettori += [".maps-address > span"]
@@ -114,14 +119,15 @@ class Immobiliare:
 		self.funzioni = [geo,country,zone,price,sup,room,wc,auto,floor,cash,agency]
 		self.selettore = ".text-primary"
 		self.funzione = links
+		self.bar = False
 
 	def GenerateWindow(self):
 		frame = ttk.Frame(width="200", height="200")
 		modulo_l = ttk.Label(frame, text="Immobiliare:", padding=[0,10,0,10], font='Arial 15 bold')
 		modulo_l.pack()
 		ven_aff_l = ttk.Label(frame, text="Vendita/Affitto:", padding = [0,0,0,10], font = 'Arial 10')
-		self.ven_aff = ttk.Combobox(frame, state = 'readonly')
-		self.ven_aff['values'] = ["Vendita", "Affitto"]
+		self.ven_aff_c = ttk.Combobox(frame, state = 'readonly')
+		self.ven_aff_c['values'] = ["Vendita", "Affitto"]
 		regioni_l = ttk.Label(frame, text="Regioni:", padding = [0,0,0,10], font = 'Arial 10')
 		self.regioni_c = ttk.Combobox(frame, state = 'readonly')
 		self.regioni_c['values'] = self.regioni
@@ -140,9 +146,12 @@ class Immobiliare:
 		def save_zona(event):
 			self.zona = event.widget.get()
 		self.zone_localita_c.bind("<<ComboboxSelected>>", save_zona)
+		def save_ven_aff(event):
+			self.ven_aff = event.widget.get()
+		self.ven_aff_c.bind("<<ComboboxSelected>>", save_ven_aff)
 		frame.pack()
 		ven_aff_l.pack()
-		self.ven_aff.pack()
+		self.ven_aff_c.pack()
 		regioni_l.pack()
 		self.regioni_c.pack()
 		province_l.pack()
@@ -152,15 +161,24 @@ class Immobiliare:
 		zone_localita_l.pack()
 		self.zone_localita_c.pack()
 		ttk.Label(frame, text="", padding = [0,5,0,5]).pack()
-		button = ttk.Button(frame, text="Scarica", command = self.Magia)
+		button = ttk.Button(frame, text="Scarica", command = lambda: threading.Thread(target=self.Magia).start())
 		button.pack()
 
 	def Magia(self):
-		link = self.BuildLink(self.ven_aff.get(),self.provincia,self.comune,self.zona)
-		Hp = HomeParsing(1)
+		link = self.BuildLink()
+		if not link:
+			return
+		Hp = HomeParsing(1,self.root)
 		lista = Hp.ExtractAnnunci(link,self.selettore,self.funzione,nextPage)
+		t = tk.Toplevel(self.root)
+		t.geometry("300x80")
+		ttk.Label(t,text="Scaricamento in corso, attendere prego",padding = [5,0,5,0]).pack()
+		self.bar = ttk.Progressbar(t,mode = 'determinate', length = "250", maximum = len(lista))
+		self.bar.pack()
 		for url in lista:
 			Hp.ExtractData(url,"Immobiliare-"+time.strftime("%d-%m")+".csv",self.selettori,self.funzioni)
+			self.bar.step()
+		t.destroy()
 
 	def getProvince(self,event):
 		self.regione = event.widget.get()
@@ -206,15 +224,21 @@ class Immobiliare:
 				self.localita += [localita.text()]
 			combobox["value"] = self.localita"""
 
-	def BuildLink(self,ven_aff,provincia,comune,zona):
+	def BuildLink(self):
+		if self.ven_aff == "":
+			a = messagebox.showerror("Errore", "Alcuni dati sono mancanti")
+			return False
+		if self.provincia == "":
+			messagebox.showerror("Errore", "Alcuni dati sono mancanti")
+			return False
 		link = "https://www.immobiliare.it/"
-		if ven_aff == "Vendita":
+		if self.ven_aff == "Vendita":
 			link += "vendita-case/"
 		else:
 			link += "affitto-case/"
-		if comune != "":
-			link += comune.lower()+"/"
-			if zona != "":
-				link += self.zone[zona]+"/"
+		if self.comune != "":
+			link += self.comune.lower()+"/"
+			if self.zona != "":
+				link += self.zone[self.zona]+"/"
 			return link+"?criterio=rilevanza"
-		return link+provincia.lower().replace(" ","-")+"-provincia/?criterio=rilevanza"
+		return link+self.provincia.lower().replace(" ","-")+"-provincia/?criterio=rilevanza"
