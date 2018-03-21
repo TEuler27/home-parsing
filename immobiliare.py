@@ -13,72 +13,88 @@ def upperfirst(x):
 	return x[0].upper() + x[1:]
 
 def price(oggetto):
-	return oggetto.text()[2:]
+	prezzo = oggetto.text()
+	if "€" in prezzo:
+		if "da" in prezzo:
+			return prezzo
+		return prezzo[2:].replace(".","")
+	else:
+		return prezzo
 
 def sup(oggetto):
 	numeri = len(oggetto("strong"))
-	return oggetto("strong").eq(numeri-1).text()
+	return oggetto("strong").eq(numeri-1).text().replace(".","")
 
 def geo(indirizzo):
 	return upperfirst(indirizzo.text().split(",")[0])
 
 def country(indirizzo):
-	return indirizzo.text().split(",")[-1].split("-")[0]
+	return indirizzo.text().split(",")[-1].split("-")[0].lstrip()
 
 def zone(indirizzo):
 	zona = indirizzo.text().split(",")[-1].split("-")
 	if len(zona)==2:
-		return zona[1]
+		return zona[1].lstrip()
 	else:
 		return ""
 
 def room(parametro):
-	numeri = len(parametro("strong"))
-	return parametro("strong").eq(-3).text()
+	for li in parametro("li").items():
+		if li("i").hasClass("rooms"):
+			return li("strong").text()
+	return ""
 
 def wc(parametro):
-	numeri = len(parametro("strong"))
-	return parametro("strong").eq(-2).text()
+	for li in parametro("li").items():
+		if li("i").hasClass("bathrooms"):
+			return li("strong").text()
+	return ""
 
 def auto(parametro):
-	try:
-		lista = parametro("dl.col-xs-12").text().split("\n")
-		indice = lista.index("Box e posti auto")+1
-		return lista[indice]
-	except ValueError:
-		return ""
+	for table in parametro.items():
+		lista = table.text().split("\n")
+		if "Box e posti auto" in lista:
+			indice = lista.index("Box e posti auto")+1
+			return lista[indice]
+	return ""
+
 
 def floor(parametro):
-	try:
-		lista = parametro("dl.col-xs-12").text().split("\n")
-		indice = lista.index("Piano")+1
-		return lista[indice]
-	except ValueError:
-		return ""
+	for table in parametro.items():
+		lista = table.text().split("\n")
+		if "Piano" in lista:
+			indice = lista.index("Piano")+1
+			return lista[indice]
+	return ""
 
 def cash(parametro):
-	try:
-		lista = parametro("dl.col-xs-12").text().split("\n")
-		indice = lista.index("Spese condominio")+1
-		elementi = lista[indice].split(" ")[1]
-		return elementi.split("/")[0]
-	except ValueError:
-		return ""
+	for table in parametro.items():
+		lista = table.text().split("\n")
+		if "Spese condominio" in lista:
+			indice = lista.index("Spese condominio")+1
+			elementi = lista[indice].split(" ")[1]
+			return elementi.split("/")[0]
+	return ""
 
 def agency(nome):
 	return nome.eq(0).text()
 
-#DA QUA ESTRAZIONE ANNUNCI
+def description(testo):
+	return testo.text().replace("\n"," ").replace("|","-")
 
 def links(url):
 	lista = []
 	for a in url("a").items():
-		lista.append(a.attr("href"))
+		href = a.attr("href")
+		if "http" in href:
+			lista.append(href)
 	return lista
 
 
 def nextPage(pagina,indirizzo):
 	bottone = pagina(".pull-right")("li")
+	if bottone("a").eq(0).html()==None:
+		return False
 	if bottone("a").eq(0).hasClass("disabled"):
 		return False
 	else:
@@ -117,7 +133,8 @@ class Immobiliare:
 		self.selettori += ["dl.col-xs-12"]
 		self.selettori += ["dl.col-xs-12"]
 		self.selettori += [".contact-data__name"]
-		self.funzioni = [geo,country,zone,price,sup,room,wc,auto,floor,cash,agency]
+		self.selettori += [".description-text"]
+		self.funzioni = [geo,country,zone,price,sup,room,wc,auto,floor,cash,agency,description]
 		self.selettore = ".text-primary"
 		self.funzione = links
 		self.bar = False
@@ -191,7 +208,7 @@ class Immobiliare:
 		self.bar.start()
 		df = pd.read_csv(nomefile, sep="|")
 		df.drop_duplicates(subset=None, inplace=True)
-		df.to_csv(nomefile, sep="|")
+		df.to_csv(nomefile, sep="|", index = False)
 		t.destroy()
 
 	def getProvince(self,event):

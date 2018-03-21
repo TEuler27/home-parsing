@@ -1,4 +1,4 @@
 #!/bin/bash
 
-cd /home/edoardo/Documenti/Lavori/home-parsing
+cd /home/zonato/Desktop/Programmazione/home-parsing
 python3 homeparsing_launcher.py
