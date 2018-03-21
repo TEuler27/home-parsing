@@ -16,6 +16,7 @@ class HomeParsing(object):
 	def GenerateWindow(self,new):
 		if new == 0:
 			self.root = tk.Tk()
+			self.root.title("HomeParsing")
 			self.root.geometry("800x800")
 			moduli = json.loads(open("moduli.json").read())
 			for modulo in moduli:
@@ -27,7 +28,7 @@ class HomeParsing(object):
 	def ExtractAnnunci(self,indirizzo,selettore,funzione,next):
 		t = tk.Toplevel(self.root)
 		t.geometry("300x80")
-		ttk.Label(t,text="Scaricamento in corso, attendere prego",padding = [5,0,5,0]).pack()
+		ttk.Label(t,text="Sto caricando gli annunci, attendere prego",padding = [0,10,0,10]).pack()
 		self.bar = ttk.Progressbar(t,mode = 'indeterminate', length = "250")
 		self.bar.pack()
 		self.bar.start()
@@ -51,7 +52,11 @@ class HomeParsing(object):
 		return lista
 
 	def ExtractData(self,indirizzo,nome_doc,selettori,funzioni):
-		pagina_vergine = urlopen(indirizzo).read()
+		try:
+			pagina_vergine = urlopen(indirizzo).read()
+		except:
+			print(indirizzo)
+			return
 		pagina = pq(pagina_vergine)
 		dati = ""
 		for i in range(len(selettori)):
@@ -61,6 +66,7 @@ class HomeParsing(object):
 				dati = dato
 			else:
 				dati += "|" + dato
+		dati += "|" + indirizzo
 		file = open(nome_doc,"a")
 		file.write(dati+"\n")
 		file.close()

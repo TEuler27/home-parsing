@@ -7,6 +7,7 @@ import json
 import time
 from HomeParsing import *
 import threading
+import pandas as pd
 
 def upperfirst(x):
 	return x[0].upper() + x[1:]
@@ -166,18 +167,31 @@ class Immobiliare:
 
 	def Magia(self):
 		link = self.BuildLink()
+		print(link)
 		if not link:
 			return
 		Hp = HomeParsing(1,self.root)
 		lista = Hp.ExtractAnnunci(link,self.selettore,self.funzione,nextPage)
 		t = tk.Toplevel(self.root)
 		t.geometry("300x80")
-		ttk.Label(t,text="Scaricamento in corso, attendere prego",padding = [5,0,5,0]).pack()
+		label = ttk.Label(t,text="Scaricamento in corso dei dati, attendere prego",padding = [0,10,0,10])
+		label.pack()
 		self.bar = ttk.Progressbar(t,mode = 'determinate', length = "250", maximum = len(lista))
 		self.bar.pack()
+		nomefile = "Immobiliare-"+time.strftime("%d-%m--%H:%M")+".csv"
+		legenda = "Indirizzo|Citta|Zona|Prezzo|Superficie|Locali|Bagni|Box Auto|Piano|Spese condominiali|Agenzia immobiliare"
+		file = open(nomefile,"w")
+		file.write(legenda+"\n")
+		file.close()
 		for url in lista:
-			Hp.ExtractData(url,"Immobiliare-"+time.strftime("%d-%m")+".csv",self.selettori,self.funzioni)
+			Hp.ExtractData(url,nomefile,self.selettori,self.funzioni)
 			self.bar.step()
+		label["text"] = "Sto eliminando i duplicati, attendere prego"
+		self.bar["mode"] = "indeterminate"
+		self.bar.start()
+		df = pd.read_csv(nomefile, sep="|")
+		df.drop_duplicates(subset=None, inplace=True)
+		df.to_csv(nomefile, sep="|")
 		t.destroy()
 
 	def getProvince(self,event):
@@ -237,7 +251,7 @@ class Immobiliare:
 		else:
 			link += "affitto-case/"
 		if self.comune != "":
-			link += self.comune.lower()+"/"
+			link += self.comune.lower().replace(" ", "-")+"/"
 			if self.zona != "":
 				link += self.zone[self.zona]+"/"
 			return link+"?criterio=rilevanza"
