@@ -112,7 +112,7 @@ class Immobiliare:
 
 	def __init__(self,root):
 		self.root = root
-		self.regioni = ["Valle D'Aosta","Lombardia","Piemonte","Liguria","Trentino Alto-Adige","Veneto","Friuli Venezia-Giulia","Emilia Romagna","Toscana","Marche","Lazio","Umbria","Abruzzo","Molise","Basilicata","Puglia","Campania","Calabria","Sicilia","Sardegna"]
+		self.regioni = sorted(["Valle D'Aosta","Lombardia","Piemonte","Liguria","Trentino Alto-Adige","Veneto","Friuli Venezia-Giulia","Emilia Romagna","Toscana","Marche","Lazio","Umbria","Abruzzo","Molise","Basilicata","Puglia","Campania","Calabria","Sicilia","Sardegna"])
 		self.regione = ""
 		self.provincia = ""
 		self.province = {}
@@ -220,7 +220,7 @@ class Immobiliare:
 			if provincia["indexArea"] == 0:
 				self.province[provincia["nome"]] = provincia["idProvincia"]
 				province += [provincia["nome"]]
-		self.province_c['value'] = province
+		self.province_c['value'] = sorted(province)
 
 	def getComuni(self,event):
 		self.provincia = event.widget.get()
@@ -233,7 +233,7 @@ class Immobiliare:
 		for comune in json_data["result"]:
 			self.comuni[comune["nome"]] = {"idComune": comune["idComune"], "conZone": comune["conZone"], "conLocalita": comune["conLocalita"], "keyurl": comune["keyurl"]}
 			comuni += [comune["nome"]]
-		self.comuni_c["value"] = comuni
+		self.comuni_c["value"] = sorted(comuni)
 
 	def getZoneLocalita(self,event):
 		self.comune = event.widget.get()
@@ -247,7 +247,7 @@ class Immobiliare:
 			for idZona in json_data["result"]:
 				self.zone[json_data["result"][idZona]['macrozona_nome_sn']] = json_data["result"][idZona]['macrozona_keyurl']
 				zone += [json_data["result"][idZona]['macrozona_nome_sn']]
-			self.zone_localita_c["value"] = zone
+			self.zone_localita_c["value"] = sorted(zone)
 		"""if self.comuni[self.comune]["conLocalita"]:
 			pagina = pq(request.urlopen("https://www.immobiliare.it/vendita-case/"+self.comuni[self.comune]["keyurl"].lower().replace("_","-")).read().decode("utf8"))
 			self.localita = []
