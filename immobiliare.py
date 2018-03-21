@@ -179,7 +179,7 @@ class Immobiliare:
 		self.bar = ttk.Progressbar(t,mode = 'determinate', length = "250", maximum = len(lista))
 		self.bar.pack()
 		nomefile = "Immobiliare-"+time.strftime("%d-%m--%H:%M")+".csv"
-		legenda = "Indirizzo|Citta|Zona|Prezzo|Superficie|Locali|Bagni|Box Auto|Piano|Spese condominiali|Agenzia immobiliare"
+		legenda = "Indirizzo|Citta|Zona|Prezzo|Superficie|Locali|Bagni|Box Auto|Piano|Spese condominiali|Agenzia immobiliare|Descrizione|URL"
 		file = open(nomefile,"w")
 		file.write(legenda+"\n")
 		file.close()
