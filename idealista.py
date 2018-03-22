@@ -64,10 +64,10 @@ def room(pagina):
 
 def wc(pagina):
 	#qua metti il selettore
-	parametro = pagina(".block__features-anction > .feature-action__features")
-	for li in parametro("li").items():
-		if li("i").hasClass("bathrooms"):
-			return li("strong").text()
+	parametro = pagina("details-property_features")
+	for li in parametro("ul > li").items():
+		if "bagni" in li.text() or "bagno" in li.text():
+			return li.text()[1]
 	return ""
 
 def auto(pagina):
