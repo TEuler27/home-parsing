@@ -19,6 +19,8 @@ def price(pagina):
 	if "€" in prezzo:
 		if "da" in prezzo:
 			return prezzo
+		if "al mese" in prezzo:
+			return prezzo[2:-8].replace(".","")
 		return prezzo[2:].replace(".","")
 	else:
 		return prezzo
