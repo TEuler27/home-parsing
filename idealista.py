@@ -28,11 +28,10 @@ def price(pagina):
 def sup(pagina):
 	#qua metti il selettore
 	oggetto = pagina(".info-features")
-    numeri = oggetto("span").items()
-	for span in numeri:
-        if "m2" in span.text():
-            return span("span").text()
-    return ""
+	for span in oggetto("span").items():
+		if "m2" in span.text():
+			return span("span").text()
+	return ""
 
 def geo(pagina):
 	#qua metti il selettore
@@ -56,11 +55,10 @@ def zone(pagina):
 def room(pagina):
 	#qua metti il selettore
 	oggetto = pagina(".info-features")
-    numeri = oggetto("span").items()
-	for span in numeri:
-        if "locali" in span.text():
-            return span("span").text()
-    return ""
+	for span in oggetto("span").items():
+		if "locali" in span.text():
+			return span("span").text()
+	return ""
 
 def wc(pagina):
 	#qua metti il selettore
@@ -84,11 +82,10 @@ def auto(pagina):
 def floor(pagina):
 	#qua metti il selettore
 	oggetto = pagina(".info-features")
-    numeri = oggetto("span").items()
-	for span in numeri:
-        if "piano" in span.text() or "Piano" in span.text():
-            return span("span").text()
-    return ""
+	for span in oggetto("span").items():
+		if "piano" in span.text() or "Piano" in span.text():
+			return span("span").text()
+	return ""
 
 def cash(pagina):
 	#qua metti il selettore
@@ -139,44 +136,34 @@ def nextPage(pagina,indirizzo):
 			return indirizzo+"&pag=2"
 
 
-class Immobiliare:
+class Idealista:
 
 	def __init__(self,root):
 		self.root = root
-		self.regioni = sorted(["Valle D'Aosta","Lombardia","Piemonte","Liguria","Trentino Alto-Adige","Veneto","Friuli Venezia-Giulia","Emilia Romagna","Toscana","Marche","Lazio","Umbria","Abruzzo","Molise","Basilicata","Puglia","Campania","Calabria","Sicilia","Sardegna"])
-		self.regione = ""
 		self.provincia = ""
-		self.province = {}
 		self.comune = ""
-		self.comuni = {}
 		self.zona = ""
-		self.zone = {}
 		self.ven_aff = ""
-		self.localita = []
 		self.funzioni = [geo,country,zone,price,sup,room,wc,auto,floor,cash,agency,description]
 		self.funzione = links
 		self.bar = False
 
 	def GenerateWindow(self):
 		frame = ttk.Frame(width="200", height="200")
-		modulo_l = ttk.Label(frame, text="Immobiliare:", padding=[0,10,0,10], font='Arial 15 bold')
+		modulo_l = ttk.Label(frame, text="Idealista:", padding=[0,10,0,10], font='Arial 15 bold')
 		modulo_l.pack()
 		ven_aff_l = ttk.Label(frame, text="Vendita/Affitto:", padding = [0,0,0,10], font = 'Arial 10')
 		self.ven_aff_c = ttk.Combobox(frame, state = 'readonly')
 		self.ven_aff_c['values'] = ["Vendita", "Affitto"]
-		regioni_l = ttk.Label(frame, text="Regioni:", padding = [0,0,0,10], font = 'Arial 10')
-		self.regioni_c = ttk.Combobox(frame, state = 'readonly')
-		self.regioni_c['values'] = self.regioni
 		province_l = ttk.Label(frame, text="Provincia:", padding = [0,10,0,10], font = 'Arial 10')
 		self.province_c = ttk.Combobox(frame, state = 'readonly')
-		self.province_c['values'] = []
+		self.province_c['values'] = self.getProvince()
 		comuni_l = ttk.Label(frame, text="Comune:", padding = [0,10,0,10], font = 'Arial 10')
 		self.comuni_c = ttk.Combobox(frame, state = 'readonly')
 		self.comuni_c['values'] = []
 		zone_localita_l = ttk.Label(frame, text="Zona/Località:", padding = [0,10,0,10], font = 'Arial 10')
 		self.zone_localita_c = ttk.Combobox(frame, state = 'readonly')
 		self.zone_localita_c['values'] = []
-		self.regioni_c.bind("<<ComboboxSelected>>", self.getProvince)
 		self.province_c.bind("<<ComboboxSelected>>", self.getComuni)
 		self.comuni_c.bind("<<ComboboxSelected>>", self.getZoneLocalita)
 		def save_zona(event):
@@ -188,8 +175,6 @@ class Immobiliare:
 		frame.pack()
 		ven_aff_l.pack()
 		self.ven_aff_c.pack()
-		regioni_l.pack()
-		self.regioni_c.pack()
 		province_l.pack()
 		self.province_c.pack()
 		comuni_l.pack()
@@ -213,7 +198,7 @@ class Immobiliare:
 		label.pack()
 		self.bar = ttk.Progressbar(t,mode = 'determinate', length = "250", maximum = len(lista))
 		self.bar.pack()
-		nomefile = "Immobiliare-"+time.strftime("%d-%m--%H:%M")+".csv"
+		nomefile = "Idealista-"+time.strftime("%d-%m--%H:%M")+".csv"
 		legenda = "Indirizzo|Citta|Zona|Prezzo|Superficie|Locali|Bagni|Box Auto|Piano|Spese condominiali|Agenzia immobiliare|Descrizione|URL"
 		file = open(nomefile,"w")
 		file.write(legenda+"\n")
@@ -229,49 +214,35 @@ class Immobiliare:
 		df.to_csv(nomefile, sep="|", index = False)
 		t.destroy()
 
-	def getProvince(self,event):
-		self.regione = event.widget.get()
-		json_data = json.loads(request.urlopen("https://www.immobiliare.it/servicesV6/mapchart/cartineMapArea/regioni/"+self.regione.lower()[:3]+".json").read().decode('utf8'))
-		self.province = {}
+	def getProvince(self):
+		pagina = pq(urlopen("https://www.idealista.it/").read())
 		province = []
-		for provincia in json_data["area"]:
-			if provincia["indexArea"] == 0:
-				self.province[provincia["nome"]] = provincia["idProvincia"]
-				province += [provincia["nome"]]
-		self.province_c['value'] = sorted(province)
+		for li in pagina("#location-combo > li").items():
+			if li.text() == "--":
+				break
+			province.append(li.text())
+		return province
 
 	def getComuni(self,event):
 		self.provincia = event.widget.get()
-		sigla = self.province[self.provincia]
-		header ={"referer":"https://www.immobiliare.it/"}
-		req =  request.Request("https://www.immobiliare.it/services/geography/getGeography.php?action=getComuniProvincia&idProvincia="+sigla, headers=header)
-		json_data = json.loads(request.urlopen(req).read().decode("utf8"))
-		self.comuni = {}
+		print("https://www.idealista.it/vendita-case/"+self.provincia.lower().replace(" ", "-").replace("'","")+"/comuni")
+		pagina = pq(urlopen("https://www.idealista.it/vendita-case/"+self.provincia.lower().replace(" ", "-").replace("'","")+"/comuni").read())
+		#self.comuni = {}
 		comuni = []
-		for comune in json_data["result"]:
-			self.comuni[comune["nome"]] = {"idComune": comune["idComune"], "conZone": comune["conZone"], "conLocalita": comune["conLocalita"], "keyurl": comune["keyurl"]}
-			comuni += [comune["nome"]]
+		for li in pagina("#location_list > li").items():
+			for li_interno in li("ul > li").items():
+				comuni.append(li_interno("a").text())
 		self.comuni_c["value"] = sorted(comuni)
 
 	def getZoneLocalita(self,event):
 		self.comune = event.widget.get()
-		if self.comuni[self.comune]["conZone"]:
-			idComune = self.comuni[self.comune]["idComune"]
-			header ={"referer":"https://www.immobiliare.it/"}
-			req =  request.Request("https://www.immobiliare.it/services/geography/getGeography.php?action=getMacrozoneComune&idComune="+idComune, headers=header)
-			json_data = json.loads(request.urlopen(req).read().decode("utf8"))
-			self.zone = {}
-			zone = []
-			for idZona in json_data["result"]:
-				self.zone[json_data["result"][idZona]['macrozona_nome_sn']] = json_data["result"][idZona]['macrozona_keyurl']
-				zone += [json_data["result"][idZona]['macrozona_nome_sn']]
-			self.zone_localita_c["value"] = sorted(zone)
-		"""if self.comuni[self.comune]["conLocalita"]:
-			pagina = pq(request.urlopen("https://www.immobiliare.it/vendita-case/"+self.comuni[self.comune]["keyurl"].lower().replace("_","-")).read().decode("utf8"))
-			self.localita = []
-			for localita in pagina(".breadcrumb-list").items("a"):
-				self.localita += [localita.text()]
-			combobox["value"] = self.localita"""
+		pagina = pq(urlopen("https://www.idealista.it/vendita-case/"+self.comune.lower().replace(" ", "-").replace("'","")+"-"+self.provincia.lower().replace(" ", "-").replace("'","")+"/").read())
+		zone = []
+		for li in pagina(".breadcrumb-subitems > ul")("li").items():
+			if li("strong").text() == self.comune:
+				for li_interno in li("ul > li").items():
+					zone.append(li_interno("a").text())
+		self.zone_localita_c["value"] = sorted(zone)
 
 	def BuildLink(self):
 		if self.ven_aff == "":
