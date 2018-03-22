@@ -14,7 +14,7 @@ def upperfirst(x):
 
 def price(pagina):
 	#qua metti il selettore
-	oggetto = pagina(".info-data")(".txt-bold")
+	oggetto = pagina(".info-data")(".txt-bold").eq(1)
 	prezzo = oggetto.text()
 	if "€" in prezzo:
 		if "da" in prezzo:
@@ -30,7 +30,7 @@ def sup(pagina):
 	oggetto = pagina(".info-features")
 	for span in oggetto("span").items():
 		if "m2" in span.text():
-			return span("span").text()
+			return span("span").eq(1).text()
 	return ""
 
 def geo(pagina):
@@ -57,7 +57,7 @@ def room(pagina):
 	oggetto = pagina(".info-features")
 	for span in oggetto("span").items():
 		if "locali" in span.text():
-			return span("span").text()
+			return span("span").eq(1).text()
 	return ""
 
 def wc(pagina):
