@@ -70,12 +70,10 @@ def wc(pagina):
 
 def auto(pagina):
 	#qua metti il selettore
-	parametro = pagina("dl.col-xs-12")
-	for table in parametro.items():
-		lista = table.text().split("\n")
-		if "Box e posti auto" in lista:
-			indice = lista.index("Box e posti auto")+1
-			return lista[indice]
+	parametro = pagina("details-property_features")
+	for li in parametro("ul > li").items():
+		if "Garage/posto auto" in li.text():
+			return li.text()
 	return ""
 
 
@@ -89,23 +87,20 @@ def floor(pagina):
 
 def cash(pagina):
 	#qua metti il selettore
-	parametro = pagina("dl.col-xs-12")
-	for table in parametro.items():
-		lista = table.text().split("\n")
-		if "Spese condominio" in lista:
-			indice = lista.index("Spese condominio")+1
-			elementi = lista[indice].split(" ")[1]
-			return elementi.split("/")[0]
+	parametro = pagina("display-table_cell")
+	for p in parametro("p").items():
+		if "spese condominiali" in p.text():
+			return p.text().split(" ")[0]
 	return ""
 
 def agency(pagina):
 	#qua metti il selettore
-	nome = pagina(".contact-data__name")
-	return nome.eq(0).text()
+	pagina(".professional-name")("p").remove()
+	return pagina(".professional-name").text()
 
 def description(pagina):
 	#qua metti il selettore
-	testo = pagina(".description-text")
+	testo = pagina(".adCommentsLanguage")
 	return testo.text().replace("\n"," ").replace("|","-")
 
 def links(pagina):
