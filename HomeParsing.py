@@ -25,7 +25,7 @@ class HomeParsing(object):
 				classe.GenerateWindow()
 			self.root.mainloop()
 
-	def ExtractAnnunci(self,indirizzo,selettore,funzione,next):
+	def ExtractAnnunci(self,indirizzo,funzione,next):
 		t = tk.Toplevel(self.root)
 		t.geometry("300x80")
 		ttk.Label(t,text="Sto caricando gli annunci, attendere prego",padding = [0,10,0,10]).pack()
@@ -34,24 +34,17 @@ class HomeParsing(object):
 		self.bar.start()
 		pagina_vergine = urlopen(indirizzo).read()
 		pagina = pq(pagina_vergine)
-		oggetto = pagina(selettore)
-		lista = funzione(oggetto)
+		lista = funzione(pagina)
 		while next(pagina,indirizzo) != False:
-			try:
-				print(indirizzo)
-				indirizzo = next(pagina,indirizzo)
-				pagina_vergine = urlopen(indirizzo).read()
-				pagina = pq(pagina_vergine)
-				oggetto = pagina(selettore)
-				lista += funzione(oggetto)
-			except:
-				print(indirizzo)
-		oggetto = pagina(selettore)
-		lista += funzione(oggetto)
+			indirizzo = next(pagina,indirizzo)
+			pagina_vergine = urlopen(indirizzo).read()
+			pagina = pq(pagina_vergine)
+			lista += funzione(pagina)
+		lista += funzione(pagina)
 		t.destroy()
 		return lista
 
-	def ExtractData(self,indirizzo,nome_doc,selettori,funzioni):
+	def ExtractData(self,indirizzo,nome_doc,funzioni):
 		try:
 			pagina_vergine = urlopen(indirizzo).read()
 		except:
@@ -59,9 +52,8 @@ class HomeParsing(object):
 			return
 		pagina = pq(pagina_vergine)
 		dati = ""
-		for i in range(len(selettori)):
-			oggetto = pagina(selettori[i])
-			dato = funzioni[i](oggetto)
+		for i in range(len(funzioni)):
+			dato = funzioni[i](pagina)
 			if(i == 0):
 				dati = dato
 			else:

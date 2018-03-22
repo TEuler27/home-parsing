@@ -12,7 +12,9 @@ import pandas as pd
 def upperfirst(x):
 	return x[0].upper() + x[1:]
 
-def price(oggetto):
+def price(pagina):
+	#qua metti il selettore
+	oggetto = pagina(".features__price")
 	prezzo = oggetto.text()
 	if "€" in prezzo:
 		if "da" in prezzo:
@@ -21,36 +23,50 @@ def price(oggetto):
 	else:
 		return prezzo
 
-def sup(oggetto):
+def sup(pagina):
+	#qua metti il selettore
+	oggetto = pagina(".block__features-anction > .feature-action__features")
 	numeri = len(oggetto("strong"))
 	return oggetto("strong").eq(numeri-1).text().replace(".","")
 
-def geo(indirizzo):
+def geo(pagina):
+	#qua metti il selettore
+	indirizzo = pagina(".maps-address > span")
 	return upperfirst(indirizzo.text().split(",")[0])
 
-def country(indirizzo):
+def country(pagina):
+	#qua metti il selettore
+	indirizzo = pagina(".maps-address > span")
 	return indirizzo.text().split(",")[-1].split("-")[0].lstrip()
 
-def zone(indirizzo):
+def zone(pagina):
+	#qua metti il selettore
+	indirizzo = pagina(".maps-address > span")
 	zona = indirizzo.text().split(",")[-1].split("-")
 	if len(zona)==2:
 		return zona[1].lstrip()
 	else:
 		return ""
 
-def room(parametro):
+def room(pagina):
+	#qua metti il selettore
+	parametro = pagina(".block__features-anction > .feature-action__features")
 	for li in parametro("li").items():
 		if li("i").hasClass("rooms"):
 			return li("strong").text()
 	return ""
 
-def wc(parametro):
+def wc(pagina):
+	#qua metti il selettore
+	parametro = pagina(".block__features-anction > .feature-action__features")
 	for li in parametro("li").items():
 		if li("i").hasClass("bathrooms"):
 			return li("strong").text()
 	return ""
 
-def auto(parametro):
+def auto(pagina):
+	#qua metti il selettore
+	parametro = pagina("dl.col-xs-12")
 	for table in parametro.items():
 		lista = table.text().split("\n")
 		if "Box e posti auto" in lista:
@@ -59,7 +75,9 @@ def auto(parametro):
 	return ""
 
 
-def floor(parametro):
+def floor(pagina):
+	#qua metti il selettore
+	parametro = pagina("dl.col-xs-12")
 	for table in parametro.items():
 		lista = table.text().split("\n")
 		if "Piano" in lista:
@@ -67,7 +85,9 @@ def floor(parametro):
 			return lista[indice]
 	return ""
 
-def cash(parametro):
+def cash(pagina):
+	#qua metti il selettore
+	parametro = pagina("dl.col-xs-12")
 	for table in parametro.items():
 		lista = table.text().split("\n")
 		if "Spese condominio" in lista:
@@ -76,13 +96,19 @@ def cash(parametro):
 			return elementi.split("/")[0]
 	return ""
 
-def agency(nome):
+def agency(pagina):
+	#qua metti il selettore
+	nome = pagina(".contact-data__name")
 	return nome.eq(0).text()
 
-def description(testo):
+def description(pagina):
+	#qua metti il selettore
+	testo = pagina(".description-text")
 	return testo.text().replace("\n"," ").replace("|","-")
 
-def links(url):
+def links(pagina):
+	#qua metti il selettore
+	url = pagina(".text-primary")
 	lista = []
 	for a in url("a").items():
 		href = a.attr("href")
@@ -122,20 +148,7 @@ class Immobiliare:
 		self.zone = {}
 		self.ven_aff = ""
 		self.localita = []
-		self.selettori = [".maps-address > span"]
-		self.selettori += [".maps-address > span"]
-		self.selettori += [".maps-address > span"]
-		self.selettori += [".features__price"]
-		self.selettori += [".block__features-anction > .feature-action__features"]
-		self.selettori += [".block__features-anction > .feature-action__features"]
-		self.selettori += [".block__features-anction > .feature-action__features"]
-		self.selettori += ["dl.col-xs-12"]
-		self.selettori += ["dl.col-xs-12"]
-		self.selettori += ["dl.col-xs-12"]
-		self.selettori += [".contact-data__name"]
-		self.selettori += [".description-text"]
 		self.funzioni = [geo,country,zone,price,sup,room,wc,auto,floor,cash,agency,description]
-		self.selettore = ".text-primary"
 		self.funzione = links
 		self.bar = False
 
@@ -188,7 +201,7 @@ class Immobiliare:
 		if not link:
 			return
 		Hp = HomeParsing(1,self.root)
-		lista = Hp.ExtractAnnunci(link,self.selettore,self.funzione,nextPage)
+		lista = Hp.ExtractAnnunci(link,self.funzione,nextPage)
 		t = tk.Toplevel(self.root)
 		t.geometry("300x80")
 		label = ttk.Label(t,text="Scaricamento in corso dei dati, attendere prego",padding = [0,10,0,10])
@@ -201,7 +214,7 @@ class Immobiliare:
 		file.write(legenda+"\n")
 		file.close()
 		for url in lista:
-			Hp.ExtractData(url,nomefile,self.selettori,self.funzioni)
+			Hp.ExtractData(url,nomefile,self.funzioni)
 			self.bar.step()
 		label["text"] = "Sto eliminando i duplicati, attendere prego"
 		self.bar["mode"] = "indeterminate"
