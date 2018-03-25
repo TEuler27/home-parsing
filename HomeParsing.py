@@ -45,6 +45,7 @@ class HomeParsing(object):
 		return lista
 
 	def ExtractData(self,indirizzo,nome_doc,funzioni):
+		print(indirizzo)
 		try:
 			pagina_vergine = urlopen(indirizzo).read()
 		except:

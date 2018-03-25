@@ -16,14 +16,11 @@ def price(pagina):
 	#qua metti il selettore
 	oggetto = pagina(".info-data")(".txt-bold").eq(1)
 	prezzo = oggetto.text()
-	if "€" in prezzo:
-		if "da" in prezzo:
-			return prezzo
-		if "al mese" in prezzo:
-			return prezzo[2:-8].replace(".","")
-		return prezzo.replace(".","")
-	else:
+	if "da" in prezzo:
 		return prezzo
+	if "al mese" in prezzo:
+		return prezzo[2:-8].replace(".","")
+	return prezzo.replace(".","")
 
 def sup(pagina):
 	#qua metti il selettore
@@ -36,13 +33,18 @@ def sup(pagina):
 def geo(pagina):
 	#qua metti il selettore
 	indirizzo = pagina("#headerMap")("ul > li")
-	print("1"+indirizzo.text().split(",")[0])
-	return upperfirst(indirizzo.text().split(",")[0])
+	avviso = pagina("#static-map-container")
+	if avviso("div").eq(1).hasClass("icon-feedbk-alert"):
+		print(1)
+		return ""
+	else:
+		return upperfirst(indirizzo.text().split(",")[0])
 
 def country(pagina):
 	#qua metti il selettore
 	indirizzo = pagina(".main-info__title-minor")
-	return indirizzo.text().split(",")[-1].lstrip()
+	city = indirizzo.text().split(",")[-1].lstrip()
+	return city
 
 def zone(pagina):
 	#qua metti il selettore
@@ -94,7 +96,7 @@ def cash(pagina):
 def agency(pagina):
 	#qua metti il selettore
 	pagina(".professional-name")("p").remove()
-	return pagina(".professional-name").text()
+	return pagina(".professional-name").text().replace("\n"," ")
 
 def description(pagina):
 	#qua metti il selettore
@@ -103,9 +105,9 @@ def description(pagina):
 
 def links(pagina):
 	#qua metti il selettore
-	url = pagina(".item-info-container")
+	url = pagina(".item-link")
 	lista = []
-	for a in url("a").items():
+	for a in url.items():
 		href = a.attr("href")
 		if "http" not in href:
 			lista.append("https://www.idealista.it"+href)
