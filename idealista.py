@@ -221,7 +221,10 @@ class Idealista:
 	def getComuni(self,event):
 		self.provincia = event.widget.get()
 		print("https://www.idealista.it/vendita-case/"+self.provincia.lower().replace(" ", "-").replace("'","")+"/comuni")
-		pagina = pq(urlopen("https://www.idealista.it/vendita-case/"+self.provincia.lower().replace(" ", "-").replace("'","")+"/comuni").read())
+		if "-" in self.provincia:
+			pagina = pq(urlopen("https://www.idealista.it/vendita-case/"+self.provincia.lower().replace(" ", "-").replace("'","")+"/comuni").read())
+		else:
+			pagina = pq(urlopen("https://www.idealista.it/vendita-case/"+self.provincia.lower().replace(" ", "-").replace("'","")+"-provincia/comuni").read())
 		#self.comuni = {}
 		comuni = []
 		for li in pagina("#location_list > li").items():
