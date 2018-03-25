@@ -36,6 +36,7 @@ def sup(pagina):
 def geo(pagina):
 	#qua metti il selettore
 	indirizzo = pagina("#headerMap")("ul > li")
+	print("1"+indirizzo.text().split(",")[0])
 	return upperfirst(indirizzo.text().split(",")[0])
 
 def country(pagina):
@@ -47,6 +48,7 @@ def zone(pagina):
 	#qua metti il selettore
 	indirizzo = pagina(".main-info__title-minor")
 	zona = indirizzo.text().split(",")[0].lstrip()
+	return zona
 
 def room(pagina):
 	#qua metti il selettore
@@ -105,6 +107,8 @@ def links(pagina):
 	lista = []
 	for a in url("a").items():
 		href = a.attr("href")
+		if "http" not in href:
+			lista.append("https://www.idealista.it"+href)
 	return lista
 
 
@@ -243,14 +247,16 @@ class Idealista:
 		if self.provincia == "":
 			messagebox.showerror("Errore", "Alcuni dati sono mancanti")
 			return False
-		link = "https://www.immobiliare.it/"
+		link = "https://www.idealista.it/"
 		if self.ven_aff == "Vendita":
 			link += "vendita-case/"
 		else:
 			link += "affitto-case/"
-		if self.comune != "":
-			link += self.comune.lower().replace(" ", "-")+"/"
-			if self.zona != "":
-				link += self.zone[self.zona]+"/"
-			return link+"?criterio=rilevanza"
-		return link+self.provincia.lower().replace(" ","-")+"-provincia/?criterio=rilevanza"
+		if self.comune != "" and self.zona == "":
+			return link+self.comune.lower().replace(" ", "-")+"-"+self.provincia.lower().replace(" ","-")+"/"
+		if self.zona != "":
+			return link+self.comune.lower().replace(" ", "-")+"/"+self.zona.lower().replace(" ","-")+"/"
+		if "-" in self.provincia:
+			return link+self.provincia.lower().replace(" ","-")+"/"
+		else:
+			return link+self.provincia.lower().replace(" ","-")+"-provincia/"

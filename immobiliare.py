@@ -114,8 +114,8 @@ def links(pagina):
 	lista = []
 	for a in url("a").items():
 		href = a.attr("href")
-		if "http" in href:
-			lista.append(href)
+		if "http" not in href:
+			lista.append("https://www.immobiliare.it"+href)
 	return lista
 
 
