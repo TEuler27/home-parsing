@@ -87,7 +87,7 @@ def floor(pagina):
 
 def cash(pagina):
 	#qua metti il selettore
-	parametro = pagina("display-table_cell")
+	parametro = pagina(".display-table_cell")
 	for p in parametro("p").items():
 		if "spese condominiali" in p.text():
 			return p.text().split(" ")[0]
