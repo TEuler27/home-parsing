@@ -40,17 +40,13 @@ def geo(pagina):
 
 def country(pagina):
 	#qua metti il selettore
-	indirizzo = pagina(".maps-address > span")
-	return indirizzo.text().split(",")[-1].split("-")[0].lstrip()
+	indirizzo = pagina(".main-info__title-minor")
+	return indirizzo.text().split(",")[-1].lstrip()
 
 def zone(pagina):
 	#qua metti il selettore
-	indirizzo = pagina(".maps-address > span")
-	zona = indirizzo.text().split(",")[-1].split("-")
-	if len(zona)==2:
-		return zona[1].lstrip()
-	else:
-		return ""
+	indirizzo = pagina(".main-info__title-minor")
+	zona = indirizzo.text().split(",")[0].lstrip()
 
 def room(pagina):
 	#qua metti il selettore
@@ -105,12 +101,10 @@ def description(pagina):
 
 def links(pagina):
 	#qua metti il selettore
-	url = pagina(".text-primary")
+	url = pagina(".item-info-container")
 	lista = []
 	for a in url("a").items():
 		href = a.attr("href")
-		if "http" in href:
-			lista.append(href)
 	return lista
 
 
