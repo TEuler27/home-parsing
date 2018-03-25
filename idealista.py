@@ -115,20 +115,18 @@ def links(pagina):
 
 
 def nextPage(pagina,indirizzo):
-	bottone = pagina(".pull-right")("li")
-	if bottone("a").eq(0).html()==None:
-		return False
-	if bottone("a").eq(0).hasClass("disabled"):
+	bottone = pagina(".next > a.icon-arrow-right-after")
+	if bottone.html()==None:
 		return False
 	else:
-		if "pag=" in indirizzo:
-			this = indirizzo.split("=")
-			this[-1] = int(this[-1])+1
-			this[-1] = str(this[-1])
-			return "=".join(this)
+		if "lista-" in indirizzo:
+			url_spezzato = indirizzo[0:-4].split("-")
+			url_spezzato[-1] = int(url_spezzato[-1])+1
+			url_spezzato[-1] = str(url_spezzato[-1])
+			return "-".join(url_spezzato)+".htm"
 
 		else:
-			return indirizzo+"&pag=2"
+			return indirizzo+"lista-2.htm"
 
 
 class Idealista:
