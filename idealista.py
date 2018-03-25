@@ -62,15 +62,15 @@ def room(pagina):
 
 def wc(pagina):
 	#qua metti il selettore
-	parametro = pagina("details-property_features")
+	parametro = pagina(".details-property_features")
 	for li in parametro("ul > li").items():
 		if "bagni" in li.text() or "bagno" in li.text():
-			return li.text()[1]
+			return li.text()
 	return ""
 
 def auto(pagina):
 	#qua metti il selettore
-	parametro = pagina("details-property_features")
+	parametro = pagina(".details-property_features")
 	for li in parametro("ul > li").items():
 		if "Garage/posto auto" in li.text():
 			return li.text()
