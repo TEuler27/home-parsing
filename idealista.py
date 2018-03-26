@@ -32,31 +32,14 @@ def sup(pagina):
 
 def geo(pagina):
 	#qua metti il selettore
-	indirizzo = pagina("#headerMap")("ul > li")
-	avviso = pagina("#static-map-container")
-	if avviso("div").eq(1).hasClass("icon-feedbk-alert"):
-		print(1)
-		return ""
-	else:
-		return upperfirst(indirizzo.text().split(",")[0])
-
-def country(pagina):
-	#qua metti il selettore
-	indirizzo = pagina(".main-info__title-minor")
-	city = indirizzo.text().split(",")[-1].lstrip()
-	return city
-
-def zone(pagina):
-	#qua metti il selettore
-	indirizzo = pagina(".main-info__title-minor")
-	zona = indirizzo.text().split(",")[0].lstrip()
-	return zona
+	indirizzo = pagina("#headerMap")("ul")
+	return upperfirst(indirizzo.text().replace("\n","/"))
 
 def room(pagina):
 	#qua metti il selettore
 	oggetto = pagina(".info-features")
 	for span in oggetto("span").items():
-		if "locali" in span.text():
+		if "locali" in span.text() or "locale"in span.text():
 			return span("span").eq(1).text()
 	return ""
 
@@ -65,7 +48,7 @@ def wc(pagina):
 	parametro = pagina(".details-property_features")
 	for li in parametro("ul > li").items():
 		if "bagni" in li.text() or "bagno" in li.text():
-			return li.text()
+			return li.text().split(" ")[0]
 	return ""
 
 def auto(pagina):
@@ -82,8 +65,16 @@ def floor(pagina):
 	oggetto = pagina(".info-features")
 	for span in oggetto("span").items():
 		if "piano" in span.text() or "Piano" in span.text():
-			return span("span").text()
+			return span.text().split(" ")[0]
 	return ""
+
+def lift(pagina):
+	frase = pagina(".details-property_features")
+	for li in frase("ul > li").items():
+		if "Con ascensore" in li.text():
+			return "Si"
+	return ""
+
 
 def cash(pagina):
 	#qua metti il selettore
@@ -137,12 +128,12 @@ class Idealista:
 		self.comune = ""
 		self.zona = ""
 		self.ven_aff = ""
-		self.funzioni = [geo,country,zone,price,sup,room,wc,auto,floor,cash,agency,description]
+		self.funzioni = [geo,price,sup,room,wc,auto,floor,lift,cash,agency,description]
 		self.funzione = links
 		self.bar = False
 
 	def GenerateWindow(self):
-		frame = ttk.Frame(width="200", height="200")
+		frame = self.root
 		modulo_l = ttk.Label(frame, text="Idealista:", padding=[0,10,0,10], font='Arial 15 bold')
 		modulo_l.pack()
 		ven_aff_l = ttk.Label(frame, text="Vendita/Affitto:", padding = [0,0,0,10], font = 'Arial 10')
@@ -165,7 +156,6 @@ class Idealista:
 		def save_ven_aff(event):
 			self.ven_aff = event.widget.get()
 		self.ven_aff_c.bind("<<ComboboxSelected>>", save_ven_aff)
-		frame.pack()
 		ven_aff_l.pack()
 		self.ven_aff_c.pack()
 		province_l.pack()
@@ -192,7 +182,7 @@ class Idealista:
 		self.bar = ttk.Progressbar(t,mode = 'determinate', length = "250", maximum = len(lista))
 		self.bar.pack()
 		nomefile = "Idealista-"+time.strftime("%d-%m--%H:%M")+".csv"
-		legenda = "Indirizzo|Citta|Zona|Prezzo|Superficie|Locali|Bagni|Box Auto|Piano|Spese condominiali|Agenzia immobiliare|Descrizione|URL"
+		legenda = "Indirizzo|Prezzo|Superficie|Locali|Bagni|Box Auto|Piano|Ascensore|Spese condominiali|Agenzia immobiliare|Descrizione|URL"
 		file = open(nomefile,"w")
 		file.write(legenda+"\n")
 		file.close()
