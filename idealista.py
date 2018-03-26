@@ -65,7 +65,7 @@ def floor(pagina):
 	oggetto = pagina(".info-features")
 	for span in oggetto("span").items():
 		if "piano" in span.text() or "Piano" in span.text():
-			return span.text().split(" ")[0]
+			return span.text()
 	return ""
 
 def lift(pagina):
