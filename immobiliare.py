@@ -114,8 +114,8 @@ def links(pagina):
 	lista = []
 	for a in url("a").items():
 		href = a.attr("href")
-		if "http" in href:
-			lista.append(href)
+		if "http" not in href:
+			lista.append("https://www.immobiliare.it"+href)
 	return lista
 
 
@@ -155,7 +155,7 @@ class Immobiliare:
 		self.bar = False
 
 	def GenerateWindow(self):
-		frame = ttk.Frame(width="200", height="200")
+		frame = self.root
 		modulo_l = ttk.Label(frame, text="Immobiliare:", padding=[0,10,0,10], font='Arial 15 bold')
 		modulo_l.pack()
 		ven_aff_l = ttk.Label(frame, text="Vendita/Affitto:", padding = [0,0,0,10], font = 'Arial 10')
@@ -182,7 +182,6 @@ class Immobiliare:
 		def save_ven_aff(event):
 			self.ven_aff = event.widget.get()
 		self.ven_aff_c.bind("<<ComboboxSelected>>", save_ven_aff)
-		frame.pack()
 		ven_aff_l.pack()
 		self.ven_aff_c.pack()
 		regioni_l.pack()
