@@ -1,7 +1,7 @@
 from urllib.request import urlopen
 from pyquery import PyQuery as pq
 import tkinter as tk
-from tkinter import ttk
+from tkinter import Menu, ttk, filedialog
 from importlib import import_module
 import json
 import functools
@@ -17,13 +17,64 @@ class HomeParsing(object):
 		if new == 0:
 			self.root = tk.Tk()
 			self.root.title("HomeParsing")
-			self.root.geometry("800x800")
+			self.root.geometry("400x400")
+			menubar = Menu(self.root, relief="flat", bd = 2)
+			filemenu = Menu(menubar, tearoff=0)
 			moduli = json.loads(open("moduli.json").read())
+			file = open("opzioni.json","r")
+			preferenze = json.loads(file.read())
+			file.close()
 			for modulo in moduli:
 				modulo_py = getattr(import_module(modulo.lower()), modulo)
 				classe = modulo_py(self.root)
-				classe.GenerateWindow()
+				filemenu.add_command(label=modulo, command=classe.GenerateWindow)
+				if modulo == preferenze["default"]:
+					classe.GenerateWindow()
+			menubar.add_cascade(label="Modulo", menu=filemenu)
+			filemenu = Menu(menubar, tearoff=0)
+			filemenu.add_command(label="Preferenze",command=self.Opzioni)
+			menubar.add_cascade(label="Opzioni", menu=filemenu)
+			self.root.config(menu=menubar)
 			self.root.mainloop()
+
+	def Opzioni(self):
+		filename = ""
+		def Path():
+			nonlocal filename
+			filename = filedialog.askdirectory()
+			opzioni.lift()
+			opzioni.attributes("-topmost", True)
+		def Salva():
+			default = default_c.get()
+			file = open("opzioni.json","r")
+			preferenze = json.loads(file.read())
+			file.close()
+			preferenze["default"] = default
+			preferenze["path"] = filename+"/"
+			file = open("opzioni.json","w")
+			file.write(json.dumps(preferenze))
+			file.close()
+			opzioni.destroy()
+		file = open("opzioni.json","r")
+		preferenze = json.loads(file.read())
+		file.close()
+		opzioni = tk.Tk()
+		opzioni.title("Opzioni")
+		opzioni.geometry("400x400")
+		default_l = ttk.Label(opzioni, text="Modulo di apertura:", padding = [0,10,0,10], font = 'Arial 10')
+		default_c = ttk.Combobox(opzioni, state = 'readonly')
+		default_c['values'] = json.loads(open("moduli.json").read())
+		default_c.current(default_c["values"].index(preferenze["default"]))
+		empty_l = ttk.Label(opzioni, padding = [0,20,0,20])
+		path_l = ttk.Label(opzioni, text="Cartella di destinazione:", padding = [0,10,0,10], font = 'Arial 10')
+		path_b = ttk.Button(opzioni, text="Sfoglia...", command = Path)
+		default_l.pack()
+		default_c.pack()
+		path_l.pack()
+		path_b.pack()
+		empty_l.pack()
+		button = ttk.Button(opzioni, text="Salva", command = Salva)
+		button.pack()
 
 	def ExtractAnnunci(self,indirizzo,funzione,next):
 		t = tk.Toplevel(self.root)
@@ -45,7 +96,6 @@ class HomeParsing(object):
 		return lista
 
 	def ExtractData(self,indirizzo,nome_doc,funzioni):
-		print(indirizzo)
 		try:
 			pagina_vergine = urlopen(indirizzo).read()
 		except:
