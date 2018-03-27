@@ -102,6 +102,8 @@ def links(pagina):
 		href = a.attr("href")
 		if "http" not in href:
 			lista.append("https://www.idealista.it"+href)
+		else:
+			lista.append(href)
 	return lista
 
 
@@ -134,6 +136,9 @@ class Idealista:
 
 	def GenerateWindow(self):
 		frame = self.root
+		for widget in frame.winfo_children():
+			if widget.winfo_class() != "Menu":
+				widget.destroy()
 		modulo_l = ttk.Label(frame, text="Idealista:", padding=[0,10,0,10], font='Arial 15 bold')
 		modulo_l.pack()
 		ven_aff_l = ttk.Label(frame, text="Vendita/Affitto:", padding = [0,0,0,10], font = 'Arial 10')
@@ -170,7 +175,6 @@ class Idealista:
 
 	def Magia(self):
 		link = self.BuildLink()
-		print(link)
 		if not link:
 			return
 		Hp = HomeParsing(1,self.root)
@@ -181,7 +185,10 @@ class Idealista:
 		label.pack()
 		self.bar = ttk.Progressbar(t,mode = 'determinate', length = "250", maximum = len(lista))
 		self.bar.pack()
-		nomefile = "Idealista-"+time.strftime("%d-%m--%H:%M")+".csv"
+		file = open("opzioni.json","r")
+		preferenze = json.loads(file.read())
+		file.close()
+		nomefile = preferenze["path"]+"Idealista-"+time.strftime("%d-%m--%H:%M")+".csv"
 		legenda = "Indirizzo|Prezzo|Superficie|Locali|Bagni|Box Auto|Piano|Ascensore|Spese condominiali|Agenzia immobiliare|Descrizione|URL"
 		file = open(nomefile,"w")
 		file.write(legenda+"\n")
@@ -208,7 +215,6 @@ class Idealista:
 
 	def getComuni(self,event):
 		self.provincia = event.widget.get()
-		print("https://www.idealista.it/vendita-case/"+self.provincia.lower().replace(" ", "-").replace("'","")+"/comuni")
 		if "-" in self.provincia:
 			pagina = pq(urlopen("https://www.idealista.it/vendita-case/"+self.provincia.lower().replace(" ", "-").replace("'","")+"/comuni").read())
 		else:

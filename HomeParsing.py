@@ -50,7 +50,8 @@ class HomeParsing(object):
 			preferenze = json.loads(file.read())
 			file.close()
 			preferenze["default"] = default
-			preferenze["path"] = filename+"/"
+			if filename != "":
+				preferenze["path"] = filename+"/"
 			file = open("opzioni.json","w")
 			file.write(json.dumps(preferenze))
 			file.close()
@@ -60,7 +61,7 @@ class HomeParsing(object):
 		file.close()
 		opzioni = tk.Tk()
 		opzioni.title("Opzioni")
-		opzioni.geometry("400x400")
+		opzioni.geometry("400x250")
 		default_l = ttk.Label(opzioni, text="Modulo di apertura:", padding = [0,10,0,10], font = 'Arial 10')
 		default_c = ttk.Combobox(opzioni, state = 'readonly')
 		default_c['values'] = json.loads(open("moduli.json").read())
@@ -96,11 +97,7 @@ class HomeParsing(object):
 		return lista
 
 	def ExtractData(self,indirizzo,nome_doc,funzioni):
-		try:
-			pagina_vergine = urlopen(indirizzo).read()
-		except:
-			print(indirizzo)
-			return
+		pagina_vergine = urlopen(indirizzo).read()
 		pagina = pq(pagina_vergine)
 		dati = ""
 		for i in range(len(funzioni)):

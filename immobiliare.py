@@ -116,6 +116,8 @@ def links(pagina):
 		href = a.attr("href")
 		if "http" not in href:
 			lista.append("https://www.immobiliare.it"+href)
+		elif "agenzie_immobiliari" not in href:
+			lista.append(href)
 	return lista
 
 
@@ -156,12 +158,15 @@ class Immobiliare:
 
 	def GenerateWindow(self):
 		frame = self.root
+		for widget in frame.winfo_children():
+			if widget.winfo_class() != "Menu":
+				widget.destroy()
 		modulo_l = ttk.Label(frame, text="Immobiliare:", padding=[0,10,0,10], font='Arial 15 bold')
 		modulo_l.pack()
 		ven_aff_l = ttk.Label(frame, text="Vendita/Affitto:", padding = [0,0,0,10], font = 'Arial 10')
 		self.ven_aff_c = ttk.Combobox(frame, state = 'readonly')
 		self.ven_aff_c['values'] = ["Vendita", "Affitto"]
-		regioni_l = ttk.Label(frame, text="Regioni:", padding = [0,0,0,10], font = 'Arial 10')
+		regioni_l = ttk.Label(frame, text="Regioni:", padding = [0,10,0,10], font = 'Arial 10')
 		self.regioni_c = ttk.Combobox(frame, state = 'readonly')
 		self.regioni_c['values'] = self.regioni
 		province_l = ttk.Label(frame, text="Provincia:", padding = [0,10,0,10], font = 'Arial 10')
@@ -198,7 +203,6 @@ class Immobiliare:
 
 	def Magia(self):
 		link = self.BuildLink()
-		print(link)
 		if not link:
 			return
 		Hp = HomeParsing(1,self.root)
@@ -209,7 +213,10 @@ class Immobiliare:
 		label.pack()
 		self.bar = ttk.Progressbar(t,mode = 'determinate', length = "250", maximum = len(lista))
 		self.bar.pack()
-		nomefile = "Immobiliare-"+time.strftime("%d-%m--%H:%M")+".csv"
+		file = open("opzioni.json","r")
+		preferenze = json.loads(file.read())
+		file.close()
+		nomefile = preferenze["path"]+"Immobiliare-"+time.strftime("%d-%m--%H:%M")+".csv"
 		legenda = "Indirizzo|Citta|Zona|Prezzo|Superficie|Locali|Bagni|Box Auto|Piano|Spese condominiali|Agenzia immobiliare|Descrizione|URL"
 		file = open(nomefile,"w")
 		file.write(legenda+"\n")
