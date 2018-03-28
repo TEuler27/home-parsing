@@ -101,7 +101,7 @@ def cash(pagina):
 def agency(pagina):
 	#qua metti il selettore
 	nome = pagina(".contact-data__name")
-	return nome.eq(0).text()
+	return nome.eq(0).text().replace("|", " ")
 
 def description(pagina):
 	#qua metti il selettore
