@@ -44,6 +44,7 @@ class HomeParsing(object):
 			filename = filedialog.askdirectory()
 			opzioni.lift()
 			opzioni.attributes("-topmost", True)
+			path_attuale["text"] = filename
 		def Salva():
 			default = default_c.get()
 			file = open("opzioni.json","r")
@@ -68,10 +69,15 @@ class HomeParsing(object):
 		default_c.current(default_c["values"].index(preferenze["default"]))
 		empty_l = ttk.Label(opzioni, padding = [0,20,0,20])
 		path_l = ttk.Label(opzioni, text="Cartella di destinazione:", padding = [0,10,0,10], font = 'Arial 10')
+		if preferenze["path"] == "":
+			path_attuale = ttk.Label(opzioni, text="Stessa cartella del programma", padding = [0,0,0,10], font = 'Arial 10')
+		else:
+			path_attuale = ttk.Label(opzioni, text=preferenze["path"], padding = [0,0,0,10], font = 'Arial 10')
 		path_b = ttk.Button(opzioni, text="Sfoglia...", command = Path)
 		default_l.pack()
 		default_c.pack()
 		path_l.pack()
+		path_attuale.pack()
 		path_b.pack()
 		empty_l.pack()
 		button = ttk.Button(opzioni, text="Salva", command = Salva)
