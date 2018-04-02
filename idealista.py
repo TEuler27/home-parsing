@@ -205,7 +205,8 @@ class Idealista:
 		t.destroy()
 
 	def getProvince(self):
-		pagina = pq(urlopen("https://www.idealista.it/").read())
+		req = request.Request("https://www.idealista.it/",headers={'User-Agent': 'Mozilla/5.0'})
+		pagina = pq(urlopen(req).read())
 		province = []
 		for li in pagina("#location-combo > li").items():
 			if li.text() == "--":
@@ -216,9 +217,11 @@ class Idealista:
 	def getComuni(self,event):
 		self.provincia = event.widget.get()
 		if "-" in self.provincia:
-			pagina = pq(urlopen("https://www.idealista.it/vendita-case/"+self.provincia.lower().replace(" ", "-").replace("'","")+"/comuni").read())
+			req = request.Request("https://www.idealista.it/vendita-case/"+self.provincia.lower().replace(" ", "-").replace("'","")+"/comuni",headers={'User-Agent': 'Mozilla/5.0'})
+			pagina = pq(urlopen(req).read())
 		else:
-			pagina = pq(urlopen("https://www.idealista.it/vendita-case/"+self.provincia.lower().replace(" ", "-").replace("'","")+"-provincia/comuni").read())
+			req = request.Request("https://www.idealista.it/vendita-case/"+self.provincia.lower().replace(" ", "-").replace("'","")+"-provincia/comuni",headers={'User-Agent': 'Mozilla/5.0'})
+			pagina = pq(urlopen(req).read())
 		#self.comuni = {}
 		comuni = []
 		for li in pagina("#location_list > li").items():
@@ -228,7 +231,8 @@ class Idealista:
 
 	def getZoneLocalita(self,event):
 		self.comune = event.widget.get()
-		pagina = pq(urlopen("https://www.idealista.it/vendita-case/"+self.comune.lower().replace(" ", "-").replace("'","")+"-"+self.provincia.lower().replace(" ", "-").replace("'","")+"/").read())
+		req = request.Request("https://www.idealista.it/vendita-case/"+self.comune.lower().replace(" ", "-").replace("'","")+"-"+self.provincia.lower().replace(" ", "-").replace("'","")+"/",headers={'User-Agent': 'Mozilla/5.0'})
+		pagina = pq(urlopen(req).read())
 		zone = []
 		for li in pagina(".breadcrumb-subitems > ul")("li").items():
 			if li("strong").text() == self.comune:
