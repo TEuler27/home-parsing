@@ -216,7 +216,7 @@ class Immobiliare:
 		file = open("opzioni.json","r", encoding="utf-8")
 		preferenze = json.loads(file.read())
 		file.close()
-		nomefile = preferenze["path"]+"Immobiliare-"+time.strftime("%d-%m--%H:%M")+".csv"
+		nomefile = preferenze["path"]+"Immobiliare-"+time.strftime("%d-%m__%H-%M")+".csv"
 		legenda = "Indirizzo|Citta|Zona|Prezzo|Superficie|Locali|Bagni|Box Auto|Piano|Spese condominiali|Agenzia immobiliare|Descrizione|URL"
 		file = open(nomefile,"w", encoding="utf-8")
 		file.write(legenda+"\n")
@@ -227,7 +227,7 @@ class Immobiliare:
 		label["text"] = "Sto eliminando i duplicati, attendere prego"
 		self.bar["mode"] = "indeterminate"
 		self.bar.start()
-		df = pd.read_csv(nomefile, sep="|")
+		df = pd.read_csv(nomefile, sep="|",  encoding = "ISO-8859-1")
 		df.drop_duplicates(subset=None, inplace=True)
 		df.to_csv(nomefile, sep="|", index = False)
 		t.destroy()
