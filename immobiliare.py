@@ -7,7 +7,6 @@ import json
 import time
 from HomeParsing import *
 import threading
-import pandas as pd
 
 def upperfirst(x):
 	return x[0].upper() + x[1:]
@@ -206,7 +205,7 @@ class Immobiliare:
 		if not link:
 			return
 		Hp = HomeParsing(1,self.root)
-		lista = Hp.ExtractAnnunci(link,self.funzione,nextPage)
+		lista = Hp.ExtractAnnunci(link,self.funzione,nextPage,False)
 		t = tk.Toplevel(self.root)
 		t.geometry("300x80")
 		label = ttk.Label(t,text="Scaricamento in corso dei dati, attendere prego",padding = [0,10,0,10])
@@ -222,14 +221,8 @@ class Immobiliare:
 		file.write(legenda+"\n")
 		file.close()
 		for url in lista:
-			Hp.ExtractData(url,nomefile,self.funzioni)
+			Hp.ExtractData(url,nomefile,self.funzioni,False)
 			self.bar.step()
-		label["text"] = "Sto eliminando i duplicati, attendere prego"
-		self.bar["mode"] = "indeterminate"
-		self.bar.start()
-		df = pd.read_csv(nomefile, sep="|",  encoding = "ISO-8859-1")
-		df.drop_duplicates(subset=None, inplace=True)
-		df.to_csv(nomefile, sep="|", index = False)
 		t.destroy()
 
 	def getProvince(self,event):
