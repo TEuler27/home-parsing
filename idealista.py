@@ -1,4 +1,4 @@
-from pyquery import PyQuery as pq
+﻿from pyquery import PyQuery as pq
 from urllib import request
 from tkinter import ttk
 import tkinter as tk
@@ -7,7 +7,6 @@ import json
 import time
 from HomeParsing import *
 import threading
-import pandas as pd
 
 def upperfirst(x):
 	return x[0].upper() + x[1:]
@@ -196,12 +195,6 @@ class Idealista:
 		for url in lista:
 			Hp.ExtractData(url,nomefile,self.funzioni)
 			self.bar.step()
-		label["text"] = "Sto eliminando i duplicati, attendere prego"
-		self.bar["mode"] = "indeterminate"
-		self.bar.start()
-		df = pd.read_csv(nomefile, sep="|",  encoding = "ISO-8859-1")
-		df.drop_duplicates(subset=None, inplace=True)
-		df.to_csv(nomefile, sep="|", index = False)
 		t.destroy()
 
 	def getProvince(self):

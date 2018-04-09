@@ -17,7 +17,7 @@ class HomeParsing(object):
 		if new == 0:
 			self.root = tk.Tk()
 			self.root.title("HomeParsing")
-			self.root.geometry("400x400")
+			self.root.geometry("500x500")
 			menubar = Menu(self.root, relief="flat", bd = 2)
 			filemenu = Menu(menubar, tearoff=0)
 			moduli = json.loads(open("moduli.json").read())
