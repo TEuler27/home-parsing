@@ -1,4 +1,4 @@
-from pyquery import PyQuery as pq
+﻿from pyquery import PyQuery as pq
 from urllib import request
 from tkinter import ttk
 import tkinter as tk
