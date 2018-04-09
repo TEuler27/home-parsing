@@ -21,7 +21,7 @@ class HomeParsing(object):
 			menubar = Menu(self.root, relief="flat", bd = 2)
 			filemenu = Menu(menubar, tearoff=0)
 			moduli = json.loads(open("moduli.json").read())
-			file = open("opzioni.json","r")
+			file = open("opzioni.json","r", encoding="utf-8")
 			preferenze = json.loads(file.read())
 			file.close()
 			for modulo in moduli:
@@ -47,17 +47,17 @@ class HomeParsing(object):
 			path_attuale["text"] = filename
 		def Salva():
 			default = default_c.get()
-			file = open("opzioni.json","r")
+			file = open("opzioni.json","r", encoding="utf-8")
 			preferenze = json.loads(file.read())
 			file.close()
 			preferenze["default"] = default
 			if filename != "":
 				preferenze["path"] = filename+"/"
-			file = open("opzioni.json","w")
+			file = open("opzioni.json","w", encoding="utf-8")
 			file.write(json.dumps(preferenze))
 			file.close()
 			opzioni.destroy()
-		file = open("opzioni.json","r")
+		file = open("opzioni.json","r", encoding="utf-8")
 		preferenze = json.loads(file.read())
 		file.close()
 		opzioni = tk.Tk()

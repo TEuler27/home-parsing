@@ -213,12 +213,12 @@ class Immobiliare:
 		label.pack()
 		self.bar = ttk.Progressbar(t,mode = 'determinate', length = "250", maximum = len(lista))
 		self.bar.pack()
-		file = open("opzioni.json","r")
+		file = open("opzioni.json","r", encoding="utf-8")
 		preferenze = json.loads(file.read())
 		file.close()
 		nomefile = preferenze["path"]+"Immobiliare-"+time.strftime("%d-%m--%H:%M")+".csv"
 		legenda = "Indirizzo|Citta|Zona|Prezzo|Superficie|Locali|Bagni|Box Auto|Piano|Spese condominiali|Agenzia immobiliare|Descrizione|URL"
-		file = open(nomefile,"w")
+		file = open(nomefile,"w", encoding="utf-8")
 		file.write(legenda+"\n")
 		file.close()
 		for url in lista:
