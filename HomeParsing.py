@@ -5,7 +5,6 @@ from tkinter import Menu, ttk, filedialog
 from importlib import import_module
 import json
 import functools
-from fake_useragent import UserAgent
 
 
 class HomeParsing(object):

@@ -201,7 +201,6 @@ class Idealista:
 		t.destroy()
 
 	def getProvince(self):
-		ua = UserAgent()
 		req = request.Request("https://www.idealista.it/",headers={'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/65.0.3325.181 Chrome/65.0.3325.181 Safari/537.36', "referer": "https://www.idealista.it/", "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8", "accept-language": "it,en;q=0.9,en-US;q=0.8", "cache-control": "no-cache", "cookie": "pxvid=74ce6d80-3c17-11e8-815a-adb8acaa87c9; _pxvid=74ce6d80-3c17-11e8-815a-adb8acaa87c9; userUUID=48496526-372d-4ddc-b99a-d880ec2ea91d; xtvrn=$402916$; xtan402916=2-anonymous; xtant402916=1; cookieDirectiveClosed=true; atidvisitor=%7B%22name%22%3A%22atidvisitor%22%2C%22val%22%3A%7B%22vrn%22%3A%22-582070-%22%7D%2C%22options%22%3A%7B%22path%22%3A%22%2F%22%2C%22session%22%3A15724800%2C%22end%22%3A15724800%7D%7D; optimizelyEndUserId=oeu1523293211328r0.6761614747531912; SESSION=bb1de1c1-42d0-49a6-be91-d3c3e10c57c0; WID=462e24673e309bda|Wsucc|Wsucc; utag_main=v_id:0162ab59ca02000b43bc6b293a1b02087001907f0086e$_sn:1$_ss:0$_st:1523295112843$ses_id:1523293211139%3Bexp-session$_pn:2%3Bexp-session; _px2=eyJ1IjoiYjM4ZTFlMzAtM2MxNy0xMWU4LTgwZDctNmJlOGIyMjg0M2Y5IiwidiI6Ijc0Y2U2ZDgwLTNjMTctMTFlOC04MTVhLWFkYjhhY2FhODdjOSIsInQiOjE1MjMyOTM2MTMwOTcsImgiOiI3NGExNTkwODcwZjQ2YzkxMjQ3NTM5NWQ1MmExNGIyYTM4ZGYyNmMwNmNlY2JlZDRjYTZjYWJlYjE4NGFhOTkxIn0=", "pragma": "no-cache", "upgrade-insecure-requests": "1"})
 		pagina = pq(request.urlopen(req).read())
 		province = []
