@@ -1,5 +1,5 @@
 ﻿from pyquery import PyQuery as pq
-from urllib import request
+import requests
 from tkinter import ttk
 import tkinter as tk
 from tkinter import messagebox
@@ -132,8 +132,17 @@ class Idealista:
 		self.funzioni = [geo,price,sup,room,wc,auto,floor,lift,cash,agency,description]
 		self.funzione = links
 		self.bar = False
+		file = open("opzioni.json","r", encoding="utf-8")
+		preferenze = json.loads(file.read())
+		file.close()
+		self.headers = preferenze["idealista-header"]
 
 	def GenerateWindow(self):
+		file = open("opzioni.json","r", encoding="utf-8")
+		preferenze = json.loads(file.read())
+		file.close()
+		if len(preferenze["idealista-header"]) == 0:
+			self.askHeader()
 		frame = self.root
 		for widget in frame.winfo_children():
 			if widget.winfo_class() != "Menu":
@@ -173,20 +182,23 @@ class Idealista:
 		button.pack()
 
 	def Magia(self):
+		session = requests.Session()
+		file = open("opzioni.json","r", encoding="utf-8")
+		preferenze = json.loads(file.read())
+		file.close()
+		session.headers.update(self.headers)
 		link = self.BuildLink()
 		if not link:
 			return
 		Hp = HomeParsing(1,self.root)
+		Hp.setSession(session)
 		lista = Hp.ExtractAnnunci(link,self.funzione,nextPage,"https://www.idealista.it")
-		t = tk.Toplevel(self.root)
-		t.geometry("300x80")
+		t = tk.Toplevel(self.root,background="#d9d9d9")
+		t.geometry("350x80")
 		label = ttk.Label(t,text="Scaricamento in corso dei dati, attendere prego",padding = [0,10,0,10])
 		label.pack()
 		self.bar = ttk.Progressbar(t,mode = 'determinate', length = "250", maximum = len(lista))
 		self.bar.pack()
-		file = open("opzioni.json","r", encoding="utf-8")
-		preferenze = json.loads(file.read())
-		file.close()
 		nomefile = preferenze["path"]+"Idealista-"+time.strftime("%d-%m__%H-%M")+".csv"
 		legenda = "Indirizzo|Prezzo|Superficie|Locali|Bagni|Box Auto|Piano|Ascensore|Spese condominiali|Agenzia immobiliare|Descrizione|URL"
 		file = open(nomefile,"w", encoding="utf-8")
@@ -201,17 +213,24 @@ class Idealista:
 		t.destroy()
 
 	def getProvince(self):
-		req = request.Request("https://www.idealista.it/",headers={"accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
-
-	"accept-language": "it,en;q=0.9,en-US;q=0.8",
-	"cache-control": "no-cache",
-	"cookie": "userUUID=47d964f2-c471-48e4-9d1d-e3e9828ac51a; xtvrn=$402916$; xtan402916=2-anonymous; xtant402916=1; atidvisitor=%7B%22name%22%3A%22atidvisitor%22%2C%22val%22%3A%7B%22vrn%22%3A%22-582070-%22%7D%2C%22options%22%3A%7B%22path%22%3A%22%2F%22%2C%22session%22%3A15724800%2C%22end%22%3A15724800%7D%7D; cookieDirectiveClosed=true; pxvid=ffb6a610-3c3a-11e8-b188-fdebed1960a3; optimizelyEndUserId=oeu1523308473192r0.013028662740697916; _pxvid=ffb6a610-3c3a-11e8-b188-fdebed1960a3; SESSION=863e55c2-41dc-458c-80be-c226fbd57e90; WID=642ac56477c49ed0|Ws4rQ|Ws4lN; utag_main=v_id:0162ac42a9dd00917237be61127802087001907f0086e$_sn:2$_ss:0$_st:1523462749490$ses_id:1523458452272%3Bexp-session$_pn:8%3Bexp-session; _px2=eyJ1IjoiY2QwMDQ2YTAtM2Q5Yy0xMWU4LWFjODktNmRhNDYxYmNmNWZjIiwidiI6ImZmYjZhNjEwLTNjM2EtMTFlOC1iMTg4LWZkZWJlZDE5NjBhMyIsInQiOjE1MjM0NjI0MTYyNjIsImgiOiJjNTZmYzZiYjQ4MzA1NmI1M2QxZGM2MzJmMWU4MmM5YmI3YzZlYmQ4YjljNjgxMjhhNjBkNWM1NGQwYzMwNzFmIn0=",
-	"pragma": "no-cache",
-	"upgrade-insecure-requests": "1",
-	"referer": "https://www.idealista.it",
-	"user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/65.0.3325.181 Chrome/65.0.3325.181 Safari/537.36"})
-		print(request.urlopen(req).info())
-		pagina = pq(request.urlopen(req).read())
+		def restart():
+			w.destroy()
+		s = requests.Session()
+		s.headers.update(self.headers)
+		req = s.get("https://www.idealista.it/")
+		if req.status_code == 403:
+			w = tk.Toplevel(self.root)
+			w.configure(bg="#d9d9d9")
+			w.title("Sblocco richiesto")
+			w.geometry("350x150")
+			ttk.Label(w,wraplength=300,text="Idealista ci ha negato l'accesso. Visita la home di idealista digitando l'indirizzo direttamente dalla barra dell'url del tuo browser preferito e clicca su \"non sono un robot\".",padding = [0,10,0,10]).pack()
+			button = ttk.Button(w, text="Riparti", command = restart)
+			button.pack()
+			w.update()
+			w.grab_set()
+			self.root.wait_window(w)
+			req = s.get("https://www.idealista.it/")
+		pagina = pq(req.text)
 		province = []
 		for li in pagina("#location-combo > li").items():
 			if li.text() == "--":
@@ -220,30 +239,41 @@ class Idealista:
 		return province
 
 	def getComuni(self,event):
+		def restart():
+			w.destroy()
 		self.provincia = event.widget.get()
+		s = requests.Session()
+		s.headers.update(self.headers)
 		if "-" in self.provincia:
-			req = request.Request("https://www.idealista.it/vendita-case/"+self.provincia.lower().replace(" ", "-").replace("'","")+"/comuni",headers={"accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
-
-		"accept-language": "it,en;q=0.9,en-US;q=0.8",
-		"cache-control": "no-cache",
-		"cookie": "userUUID=47d964f2-c471-48e4-9d1d-e3e9828ac51a; xtvrn=$402916$; xtan402916=2-anonymous; xtant402916=1; atidvisitor=%7B%22name%22%3A%22atidvisitor%22%2C%22val%22%3A%7B%22vrn%22%3A%22-582070-%22%7D%2C%22options%22%3A%7B%22path%22%3A%22%2F%22%2C%22session%22%3A15724800%2C%22end%22%3A15724800%7D%7D; cookieDirectiveClosed=true; pxvid=ffb6a610-3c3a-11e8-b188-fdebed1960a3; optimizelyEndUserId=oeu1523308473192r0.013028662740697916; _pxvid=ffb6a610-3c3a-11e8-b188-fdebed1960a3; SESSION=863e55c2-41dc-458c-80be-c226fbd57e90; WID=642ac56477c49ed0|Ws4rQ|Ws4lN; utag_main=v_id:0162ac42a9dd00917237be61127802087001907f0086e$_sn:2$_ss:0$_st:1523462749490$ses_id:1523458452272%3Bexp-session$_pn:8%3Bexp-session; _px2=eyJ1IjoiY2QwMDQ2YTAtM2Q5Yy0xMWU4LWFjODktNmRhNDYxYmNmNWZjIiwidiI6ImZmYjZhNjEwLTNjM2EtMTFlOC1iMTg4LWZkZWJlZDE5NjBhMyIsInQiOjE1MjM0NjI0MTYyNjIsImgiOiJjNTZmYzZiYjQ4MzA1NmI1M2QxZGM2MzJmMWU4MmM5YmI3YzZlYmQ4YjljNjgxMjhhNjBkNWM1NGQwYzMwNzFmIn0=",
-		"pragma": "no-cache",
-		"upgrade-insecure-requests": "1",
-		"referer": "https://www.idealista.it",
-		"user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/65.0.3325.181 Chrome/65.0.3325.181 Safari/537.36"})
-			pagina = pq(request.urlopen(req).read())
+			req = s.get("https://www.idealista.it/vendita-case/"+self.provincia.lower().replace(" ", "-").replace("'","")+"/comuni")
+			if req.status_code == 403:
+				w = tk.Toplevel(self.root)
+				w.configure(bg="#d9d9d9")
+				w.title("Sblocco richiesto")
+				w.geometry("350x150")
+				ttk.Label(w,wraplength=300,text="Idealista ci ha negato l'accesso. Visita la home di idealista digitando l'indirizzo direttamente dalla barra dell'url del tuo browser preferito e clicca su \"non sono un robot\".",padding = [0,10,0,10]).pack()
+				button = ttk.Button(w, text="Riparti", command = restart)
+				button.pack()
+				w.update()
+				w.grab_set()
+				self.root.wait_window(w)
+				req = s.get("https://www.idealista.it/vendita-case/"+self.provincia.lower().replace(" ", "-").replace("'","")+"/comuni")
+			pagina = pq(req.text)
 		else:
-			req = request.Request("https://www.idealista.it/vendita-case/"+self.provincia.lower().replace(" ", "-").replace("'","")+"-provincia/comuni",headers={"accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
-
-		"accept-language": "it,en;q=0.9,en-US;q=0.8",
-		"cache-control": "no-cache",
-		"cookie": "userUUID=47d964f2-c471-48e4-9d1d-e3e9828ac51a; xtvrn=$402916$; xtan402916=2-anonymous; xtant402916=1; atidvisitor=%7B%22name%22%3A%22atidvisitor%22%2C%22val%22%3A%7B%22vrn%22%3A%22-582070-%22%7D%2C%22options%22%3A%7B%22path%22%3A%22%2F%22%2C%22session%22%3A15724800%2C%22end%22%3A15724800%7D%7D; cookieDirectiveClosed=true; pxvid=ffb6a610-3c3a-11e8-b188-fdebed1960a3; optimizelyEndUserId=oeu1523308473192r0.013028662740697916; _pxvid=ffb6a610-3c3a-11e8-b188-fdebed1960a3; SESSION=863e55c2-41dc-458c-80be-c226fbd57e90; WID=642ac56477c49ed0|Ws4rQ|Ws4lN; utag_main=v_id:0162ac42a9dd00917237be61127802087001907f0086e$_sn:2$_ss:0$_st:1523462749490$ses_id:1523458452272%3Bexp-session$_pn:8%3Bexp-session; _px2=eyJ1IjoiY2QwMDQ2YTAtM2Q5Yy0xMWU4LWFjODktNmRhNDYxYmNmNWZjIiwidiI6ImZmYjZhNjEwLTNjM2EtMTFlOC1iMTg4LWZkZWJlZDE5NjBhMyIsInQiOjE1MjM0NjI0MTYyNjIsImgiOiJjNTZmYzZiYjQ4MzA1NmI1M2QxZGM2MzJmMWU4MmM5YmI3YzZlYmQ4YjljNjgxMjhhNjBkNWM1NGQwYzMwNzFmIn0=",
-		"pragma": "no-cache",
-		"upgrade-insecure-requests": "1",
-		"referer": "https://www.idealista.it",
-		"user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/65.0.3325.181 Chrome/65.0.3325.181 Safari/537.36"})
-			print(request.urlopen(req).info())
-			pagina = pq(request.urlopen(req).read())
+			req = s.get("https://www.idealista.it/vendita-case/"+self.provincia.lower().replace(" ", "-").replace("'","")+"-provincia/comuni")
+			if req.status_code == 403:
+				w = tk.Toplevel(self.root)
+				w.configure(bg="#d9d9d9")
+				w.title("Sblocco richiesto")
+				w.geometry("350x150")
+				ttk.Label(w,wraplength=300,text="Idealista ci ha negato l'accesso. Visita la home di idealista digitando l'indirizzo direttamente dalla barra dell'url del tuo browser preferito e clicca su \"non sono un robot\".",padding = [0,10,0,10]).pack()
+				button = ttk.Button(w, text="Riparti", command = restart)
+				button.pack()
+				w.update()
+				w.grab_set()
+				self.root.wait_window(w)
+				req = s.get("https://www.idealista.it/vendita-case/"+self.provincia.lower().replace(" ", "-").replace("'","")+"-provincia/comuni")
+			pagina = pq(req.text)
 		#self.comuni = {}
 		comuni = []
 		for li in pagina("#location_list > li").items():
@@ -252,17 +282,25 @@ class Idealista:
 		self.comuni_c["value"] = sorted(comuni)
 
 	def getZoneLocalita(self,event):
+		def restart():
+			w.destroy()
 		self.comune = event.widget.get()
-		req = request.Request("https://www.idealista.it/vendita-case/"+self.comune.lower().replace(" ", "-").replace("'","")+"-"+self.provincia.lower().replace(" ", "-").replace("'","")+"/",headers={"accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
-
-	"accept-language": "it,en;q=0.9,en-US;q=0.8",
-	"cache-control": "no-cache",
-	"cookie": "userUUID=47d964f2-c471-48e4-9d1d-e3e9828ac51a; xtvrn=$402916$; xtan402916=2-anonymous; xtant402916=1; atidvisitor=%7B%22name%22%3A%22atidvisitor%22%2C%22val%22%3A%7B%22vrn%22%3A%22-582070-%22%7D%2C%22options%22%3A%7B%22path%22%3A%22%2F%22%2C%22session%22%3A15724800%2C%22end%22%3A15724800%7D%7D; cookieDirectiveClosed=true; pxvid=ffb6a610-3c3a-11e8-b188-fdebed1960a3; optimizelyEndUserId=oeu1523308473192r0.013028662740697916; _pxvid=ffb6a610-3c3a-11e8-b188-fdebed1960a3; SESSION=863e55c2-41dc-458c-80be-c226fbd57e90; WID=642ac56477c49ed0|Ws4rQ|Ws4lN; utag_main=v_id:0162ac42a9dd00917237be61127802087001907f0086e$_sn:2$_ss:0$_st:1523462749490$ses_id:1523458452272%3Bexp-session$_pn:8%3Bexp-session; _px2=eyJ1IjoiY2QwMDQ2YTAtM2Q5Yy0xMWU4LWFjODktNmRhNDYxYmNmNWZjIiwidiI6ImZmYjZhNjEwLTNjM2EtMTFlOC1iMTg4LWZkZWJlZDE5NjBhMyIsInQiOjE1MjM0NjI0MTYyNjIsImgiOiJjNTZmYzZiYjQ4MzA1NmI1M2QxZGM2MzJmMWU4MmM5YmI3YzZlYmQ4YjljNjgxMjhhNjBkNWM1NGQwYzMwNzFmIn0=",
-	"pragma": "no-cache",
-	"upgrade-insecure-requests": "1",
-	"referer": "https://www.idealista.it",
-	"user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/65.0.3325.181 Chrome/65.0.3325.181 Safari/537.36"})
-		pagina = pq(request.urlopen(req).read())
+		s = requests.Session()
+		s.headers.update(self.headers)
+		req = s.get("https://www.idealista.it/vendita-case/"+self.comune.lower().replace(" ", "-").replace("'","")+"-"+self.provincia.lower().replace(" ", "-").replace("'","")+"/")
+		if req.status_code == 403:
+			w = tk.Toplevel(self.root)
+			w.configure(bg="#d9d9d9")
+			w.title("Sblocco richiesto")
+			w.geometry("350x150")
+			ttk.Label(w,wraplength=300,text="Idealista ci ha negato l'accesso. Visita la home di idealista digitando l'indirizzo direttamente dalla barra dell'url del tuo browser preferito e clicca su \"non sono un robot\".",padding = [0,10,0,10]).pack()
+			button = ttk.Button(w, text="Riparti", command = restart)
+			button.pack()
+			w.update()
+			w.grab_set()
+			self.root.wait_window(w)
+			req = s.get("https://www.idealista.it/vendita-case/"+self.comune.lower().replace(" ", "-").replace("'","")+"-"+self.provincia.lower().replace(" ", "-").replace("'","")+"/")
+		pagina = pq(req.text)
 		zone = []
 		for li in pagina(".breadcrumb-subitems > ul")("li").items():
 			if li("strong").text() == self.comune:
@@ -290,3 +328,36 @@ class Idealista:
 			return link+self.provincia.lower().replace(" ","-")+"/"
 		else:
 			return link+self.provincia.lower().replace(" ","-")+"-provincia/"
+
+	def askHeader(self):
+		def Salva():
+			input_str = e.get()
+			headers = input_str.split("\n")
+			result = {}
+			for header in headers:
+				if len(header) == 0:
+					continue
+				if header[0] == ":":
+					continue
+				if header.split(":")[0] == "cookie" or header.split(":")[0] == "accept-encoding" or header.split(":")[0] == "referer":
+					continue
+				result[header.split(":")[0]] = ":".join(header.split(":")[1:])
+			file = open("opzioni.json","r", encoding="utf-8")
+			preferenze = json.loads(file.read())
+			file.close()
+			preferenze["idealista-header"] = result
+			file = open("opzioni.json","w", encoding="utf-8")
+			file.write(json.dumps(preferenze))
+			file.close()
+			t.destroy()
+		t = tk.Tk(background="#d9d9d9")
+		t.title("Idealista Header")
+		t.geometry("500x400")
+		label = ttk.Label(t,wraplength=450,text="E' la prima volta che utilizzi il modulo di idealista. Per poter proseguire apri il tuo browser preferito, clicca con il tasto destro in qualsiasi punto della pagina e seleziona la voce ispeziona (o analizza elemento). Apri la voce network (o rete) e a questo punto visita la home di idealista digitando l'indirzzo direttamente dalla barra. Seleziona la scheda relativa al file \"/\". Apri la voce \"header richiesta\" e copia tutto il suo contenuto in questo campo di testo.",padding = [0,10,0,10])
+		label.pack()
+		e = ttk.Entry(t)
+		e.pack()
+		ttk.Label(t,text="",padding = [0,5,0,5]).pack()
+		button = ttk.Button(t, text="Salva", command = Salva)
+		button.pack()
+		return

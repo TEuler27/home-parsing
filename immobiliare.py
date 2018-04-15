@@ -7,6 +7,7 @@ import json
 import time
 from HomeParsing import *
 import threading
+import requests
 
 def upperfirst(x):
 	return x[0].upper() + x[1:]
@@ -201,13 +202,15 @@ class Immobiliare:
 		button.pack()
 
 	def Magia(self):
+		session = requests.Session()
 		link = self.BuildLink()
 		if not link:
 			return
 		Hp = HomeParsing(1,self.root)
+		Hp.setSession(session)
 		lista = Hp.ExtractAnnunci(link,self.funzione,nextPage,False)
-		t = tk.Toplevel(self.root)
-		t.geometry("300x80")
+		t = tk.Toplevel(self.root,background="#d9d9d9")
+		t.geometry("350x80")
 		label = ttk.Label(t,text="Scaricamento in corso dei dati, attendere prego",padding = [0,10,0,10])
 		label.pack()
 		self.bar = ttk.Progressbar(t,mode = 'determinate', length = "250", maximum = len(lista))
