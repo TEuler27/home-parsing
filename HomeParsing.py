@@ -112,7 +112,6 @@ class HomeParsing(object):
 			indirizzo_n = next(pagina,indirizzo)
 			self.s.headers.update({"referer": indirizzo})
 			req = self.s.get(indirizzo_n)
-			print(str(req.status_code)+' ---> '+indirizzo_n)
 			if req.status_code == 403 and "idealista" in indirizzo_n:
 				w = tk.Toplevel(self.root)
 				w.configure(background="#d9d9d9")
@@ -144,7 +143,6 @@ class HomeParsing(object):
 		else:
 			self.s.headers.update({"referer": referer})
 			req = self.s.get(indirizzo)
-		print(str(req.status_code)+' ---> '+indirizzo)
 		if req.status_code == 403 and "idealista" in indirizzo:
 			w = tk.Toplevel(self.root)
 			w.configure(background="#d9d9d9")
@@ -153,7 +151,7 @@ class HomeParsing(object):
 			label = ttk.Label(w,wraplength=300,text="Idealista ci ha negato l'accesso. Visita la home di idealista digitando l'indirizzo direttamente dalla barra dell'url del tuo browser preferito e clicca su \"non sono un robot\".",padding = [0,10,0,10])
 			label.config(background="#d9d9d9")
 			label.pack()
-			button = ttk.Button(w,wraplength=300, text="Riparti", command = restart)
+			button = ttk.Button(w, text="Riparti", command = restart)
 			button.pack()
 			w.update()
 			w.grab_set()

@@ -354,13 +354,14 @@ class Idealista:
 					continue
 				if header[0] == ":":
 					continue
-				if header.split(":")[0].lower() == "cookie" or header.split(":")[0].lower() == "accept-encoding" or header.split(":")[0].lower() == "referer" or header.split(":")[0].lower() == "connection":
+				if header.split(":")[0].lower() == "accept-encoding" or header.split(":")[0].lower() == "referer" or header.split(":")[0].lower() == "connection":
 					continue
 				result[header.split(":")[0]] = ":".join(header.split(":")[1:])
 			file = open("opzioni.json","r", encoding="utf-8")
 			preferenze = json.loads(file.read())
 			file.close()
 			preferenze["idealista-header"] = result
+			self.headers = result
 			file = open("opzioni.json","w", encoding="utf-8")
 			file.write(json.dumps(preferenze))
 			file.close()
@@ -369,7 +370,7 @@ class Idealista:
 		t.configure(background="#d9d9d9")
 		t.title("Idealista Header")
 		t.geometry("500x250")
-		label = ttk.Label(t,wraplength=450,text="E' la prima volta che utilizzi il modulo di idealista. Per poter proseguire apri il tuo browser preferito, clicca con il tasto destro in qualsiasi punto della pagina e seleziona la voce ispeziona (o analizza elemento). Apri la voce network (o rete) e a questo punto visita la home di idealista digitando l'indirzzo direttamente dalla barra. Seleziona la scheda relativa al file \"/\". Apri la voce \"header richiesta\" e copia tutto il suo contenuto in questo campo di testo.",padding = [0,10,0,10])
+		label = ttk.Label(t,wraplength=450,text="E' la prima volta che utilizzi il modulo di idealista. Per poter proseguire apri il tuo browser preferito, clicca con il tasto destro in qualsiasi punto della pagina e seleziona la voce ispeziona (o analizza elemento). Apri la voce network (o rete) e a questo punto visita la home di idealista digitando l'indirzzo direttamente dalla barra. Seleziona la scheda relativa al file \"/\" (o alla home di idealista). Apri la voce \"header richiesta\" e copia tutto il suo contenuto in questo campo di testo.",padding = [0,10,0,10])
 		label.config(background="#d9d9d9")
 		label.pack()
 		e = ttk.Entry(t)
