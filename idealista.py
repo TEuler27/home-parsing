@@ -13,7 +13,7 @@ def upperfirst(x):
 
 def price(pagina):
 	#qua metti il selettore
-	oggetto = pagina(".info-data")(".txt-bold").eq(1)
+	oggetto = pagina(".info-data")(".txt-bold").eq(0)
 	prezzo = oggetto.text()
 	if "da" in prezzo:
 		return prezzo
@@ -306,7 +306,7 @@ class Idealista:
 			w.configure(background="#d9d9d9")
 			w.title("Sblocco richiesto")
 			w.geometry("350x150")
-			label = ttk.Label(w,wraplength=300,text="Idealista ci ha negato l'accesso. Visita la home di idealista digitando l'indirizzo direttamente dalla barra dell'url del tuo browser preferito e clicca su \"non sono un robot\".",padding = [0,10,0,10])
+			label = ttk.Label(w,wraplength=300,text="Idealista ci ha negato l'accesso. Visita la home di idealista digitando l'indirizzo direttamente dalla barra dell'url del tuo browser preferito e clicca su \"non sono un robot\". Se non visualizzi il captcha svuota la cache e riprova.",padding = [0,10,0,10])
 			label.config(background="#d9d9d9")
 			label.pack()
 			button = ttk.Button(w, text="Riparti", command = restart)
@@ -372,7 +372,7 @@ class Idealista:
 		t.configure(background="#d9d9d9")
 		t.title("Idealista Header")
 		t.geometry("500x250")
-		label = ttk.Label(t,wraplength=450,text="E' la prima volta che utilizzi il modulo di idealista. Per poter proseguire apri il tuo browser preferito, clicca con il tasto destro in qualsiasi punto della pagina e seleziona la voce ispeziona (o analizza elemento). Apri la voce network (o rete) e a questo punto visita la home di idealista digitando l'indirzzo direttamente dalla barra. Seleziona la scheda relativa al file \"/\" (o alla home di idealista). Apri la voce \"header richiesta\" e copia tutto il suo contenuto in questo campo di testo.",padding = [0,10,0,10])
+		label = ttk.Label(t,wraplength=450,text="E' la prima volta che utilizzi il modulo di idealista. Per poter proseguire apri il tuo browser preferito, clicca con il tasto destro in qualsiasi punto della pagina e seleziona la voce ispeziona (o analizza elemento). Apri la voce network (o rete) e a questo punto visita la home di idealista digitando l'indirizzo direttamente dalla barra. Seleziona la scheda relativa al file \"/\" (o a www.idealista.it). Apri la voce \"header richiesta\" e copia tutto il suo contenuto in questo campo di testo.",padding = [0,10,0,10])
 		label.config(background="#d9d9d9")
 		label.pack()
 		e = ttk.Entry(t)
