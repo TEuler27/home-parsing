@@ -350,14 +350,15 @@ class Idealista:
 			headers = input_str.split("\n")
 			result = {}
 			for header in headers:
+				split = header.split(":")
 				if len(header) == 0:
 					continue
 				if header[0] == ":":
 					continue
-				if header.split(":")[0].lower() == "accept-encoding" or header.split(":")[0].lower() == "referer" or header.split(":")[0].lower() == "connection":
+				if split[0].lower() == "accept-encoding" or split[0].lower() == "referer" or split[0].lower() == "connection":
 					continue
-				result[header.split(":")[0].strip(" ")] = ":".join(header.split(":")[1:])
-				result[header.split(":")[0].strip(" ")].strip(" ")
+				join = ":".join(split[1:])
+				result[split[0].strip(" ")] = join.strip(" ")
 			file = open("opzioni.json","r", encoding="utf-8")
 			preferenze = json.loads(file.read())
 			file.close()
