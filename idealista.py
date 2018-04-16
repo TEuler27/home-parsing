@@ -356,7 +356,7 @@ class Idealista:
 					continue
 				if header.split(":")[0].lower() == "accept-encoding" or header.split(":")[0].lower() == "referer" or header.split(":")[0].lower() == "connection":
 					continue
-				result[header.split(":")[0]] = ":".join(header.split(":")[1:]).strip(" ")
+				result[header.split(":")[0].strip(" ")] = (":".join(header.split(":")[1:])).strip(" ")
 			file = open("opzioni.json","r", encoding="utf-8")
 			preferenze = json.loads(file.read())
 			file.close()
