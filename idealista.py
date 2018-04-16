@@ -141,24 +141,28 @@ class Idealista:
 		file = open("opzioni.json","r", encoding="utf-8")
 		preferenze = json.loads(file.read())
 		file.close()
+		frame = self.root
 		if len(preferenze["idealista-header"]) == 0:
 			self.askHeader()
-		frame = self.root
 		for widget in frame.winfo_children():
 			if widget.winfo_class() != "Menu":
 				widget.destroy()
 		modulo_l = ttk.Label(frame, text="Idealista:", padding=[0,10,0,10], font='Arial 15 bold')
+		modulo_l.config(background="#d9d9d9")
 		modulo_l.pack()
 		ven_aff_l = ttk.Label(frame, text="Vendita/Affitto:", padding = [0,0,0,10], font = 'Arial 10')
 		self.ven_aff_c = ttk.Combobox(frame, state = 'readonly')
 		self.ven_aff_c['values'] = ["Vendita", "Affitto"]
 		province_l = ttk.Label(frame, text="Provincia:", padding = [0,10,0,10], font = 'Arial 10')
+		province_l.config(background="#d9d9d9")
 		self.province_c = ttk.Combobox(frame, state = 'readonly')
 		self.province_c['values'] = self.getProvince()
 		comuni_l = ttk.Label(frame, text="Comune:", padding = [0,10,0,10], font = 'Arial 10')
+		comuni_l.config(background="#d9d9d9")
 		self.comuni_c = ttk.Combobox(frame, state = 'readonly')
 		self.comuni_c['values'] = []
 		zone_localita_l = ttk.Label(frame, text="Zona/Località:", padding = [0,10,0,10], font = 'Arial 10')
+		zone_localita_l.config(background="#d9d9d9")
 		self.zone_localita_c = ttk.Combobox(frame, state = 'readonly')
 		self.zone_localita_c['values'] = []
 		self.province_c.bind("<<ComboboxSelected>>", self.getComuni)
@@ -177,7 +181,9 @@ class Idealista:
 		self.comuni_c.pack()
 		zone_localita_l.pack()
 		self.zone_localita_c.pack()
-		ttk.Label(frame, text="", padding = [0,5,0,5]).pack()
+		empty_l = ttk.Label(frame, text="", padding = [0,5,0,5])
+		empty_l.config(background="#d9d9d9")
+		empty_l.pack()
 		button = ttk.Button(frame, text="Scarica", command = lambda: threading.Thread(target=self.Magia).start())
 		button.pack()
 
@@ -196,6 +202,7 @@ class Idealista:
 		t = tk.Toplevel(self.root,background="#d9d9d9")
 		t.geometry("350x80")
 		label = ttk.Label(t,text="Scaricamento in corso dei dati, attendere prego",padding = [0,10,0,10])
+		label.config(background="#d9d9d9")
 		label.pack()
 		self.bar = ttk.Progressbar(t,mode = 'determinate', length = "250", maximum = len(lista))
 		self.bar.pack()
@@ -220,10 +227,12 @@ class Idealista:
 		req = s.get("https://www.idealista.it/")
 		if req.status_code == 403:
 			w = tk.Toplevel(self.root)
-			w.configure(bg="#d9d9d9")
+			w.configure(background="#d9d9d9")
 			w.title("Sblocco richiesto")
 			w.geometry("350x150")
-			ttk.Label(w,wraplength=300,text="Idealista ci ha negato l'accesso. Visita la home di idealista digitando l'indirizzo direttamente dalla barra dell'url del tuo browser preferito e clicca su \"non sono un robot\".",padding = [0,10,0,10]).pack()
+			label = ttk.Label(w,wraplength=300,text="Idealista ci ha negato l'accesso. Visita la home di idealista digitando l'indirizzo direttamente dalla barra dell'url del tuo browser preferito e clicca su \"non sono un robot\".",padding = [0,10,0,10])
+			label.config(background="#d9d9d9")
+			label.pack()
 			button = ttk.Button(w, text="Riparti", command = restart)
 			button.pack()
 			w.update()
@@ -248,10 +257,12 @@ class Idealista:
 			req = s.get("https://www.idealista.it/vendita-case/"+self.provincia.lower().replace(" ", "-").replace("'","")+"/comuni")
 			if req.status_code == 403:
 				w = tk.Toplevel(self.root)
-				w.configure(bg="#d9d9d9")
+				w.configure(background="#d9d9d9")
 				w.title("Sblocco richiesto")
 				w.geometry("350x150")
-				ttk.Label(w,wraplength=300,text="Idealista ci ha negato l'accesso. Visita la home di idealista digitando l'indirizzo direttamente dalla barra dell'url del tuo browser preferito e clicca su \"non sono un robot\".",padding = [0,10,0,10]).pack()
+				label = ttk.Label(w,wraplength=300,text="Idealista ci ha negato l'accesso. Visita la home di idealista digitando l'indirizzo direttamente dalla barra dell'url del tuo browser preferito e clicca su \"non sono un robot\".",padding = [0,10,0,10])
+				label.config(background="#d9d9d9")
+				label.pack()
 				button = ttk.Button(w, text="Riparti", command = restart)
 				button.pack()
 				w.update()
@@ -263,10 +274,12 @@ class Idealista:
 			req = s.get("https://www.idealista.it/vendita-case/"+self.provincia.lower().replace(" ", "-").replace("'","")+"-provincia/comuni")
 			if req.status_code == 403:
 				w = tk.Toplevel(self.root)
-				w.configure(bg="#d9d9d9")
+				w.configure(background="#d9d9d9")
 				w.title("Sblocco richiesto")
 				w.geometry("350x150")
-				ttk.Label(w,wraplength=300,text="Idealista ci ha negato l'accesso. Visita la home di idealista digitando l'indirizzo direttamente dalla barra dell'url del tuo browser preferito e clicca su \"non sono un robot\".",padding = [0,10,0,10]).pack()
+				label = ttk.Label(w,wraplength=300,text="Idealista ci ha negato l'accesso. Visita la home di idealista digitando l'indirizzo direttamente dalla barra dell'url del tuo browser preferito e clicca su \"non sono un robot\".",padding = [0,10,0,10])
+				label.config(background="#d9d9d9")
+				label.pack()
 				button = ttk.Button(w, text="Riparti", command = restart)
 				button.pack()
 				w.update()
@@ -290,10 +303,12 @@ class Idealista:
 		req = s.get("https://www.idealista.it/vendita-case/"+self.comune.lower().replace(" ", "-").replace("'","")+"-"+self.provincia.lower().replace(" ", "-").replace("'","")+"/")
 		if req.status_code == 403:
 			w = tk.Toplevel(self.root)
-			w.configure(bg="#d9d9d9")
+			w.configure(background="#d9d9d9")
 			w.title("Sblocco richiesto")
 			w.geometry("350x150")
-			ttk.Label(w,wraplength=300,text="Idealista ci ha negato l'accesso. Visita la home di idealista digitando l'indirizzo direttamente dalla barra dell'url del tuo browser preferito e clicca su \"non sono un robot\".",padding = [0,10,0,10]).pack()
+			label = ttk.Label(w,wraplength=300,text="Idealista ci ha negato l'accesso. Visita la home di idealista digitando l'indirizzo direttamente dalla barra dell'url del tuo browser preferito e clicca su \"non sono un robot\".",padding = [0,10,0,10])
+			label.config(background="#d9d9d9")
+			label.pack()
 			button = ttk.Button(w, text="Riparti", command = restart)
 			button.pack()
 			w.update()
@@ -339,7 +354,7 @@ class Idealista:
 					continue
 				if header[0] == ":":
 					continue
-				if header.split(":")[0] == "cookie" or header.split(":")[0] == "accept-encoding" or header.split(":")[0] == "referer":
+				if header.split(":")[0].lower() == "cookie" or header.split(":")[0].lower() == "accept-encoding" or header.split(":")[0].lower() == "referer" or header.split(":")[0].lower() == "connection":
 					continue
 				result[header.split(":")[0]] = ":".join(header.split(":")[1:])
 			file = open("opzioni.json","r", encoding="utf-8")
@@ -350,15 +365,19 @@ class Idealista:
 			file.write(json.dumps(preferenze))
 			file.close()
 			t.destroy()
-		t = tk.Tk()
-		t.configure(bg="#d9d9d9")
+		t = tk.Toplevel(self.root)
+		t.configure(background="#d9d9d9")
 		t.title("Idealista Header")
-		t.geometry("500x400")
+		t.geometry("500x250")
 		label = ttk.Label(t,wraplength=450,text="E' la prima volta che utilizzi il modulo di idealista. Per poter proseguire apri il tuo browser preferito, clicca con il tasto destro in qualsiasi punto della pagina e seleziona la voce ispeziona (o analizza elemento). Apri la voce network (o rete) e a questo punto visita la home di idealista digitando l'indirzzo direttamente dalla barra. Seleziona la scheda relativa al file \"/\". Apri la voce \"header richiesta\" e copia tutto il suo contenuto in questo campo di testo.",padding = [0,10,0,10])
+		label.config(background="#d9d9d9")
 		label.pack()
 		e = ttk.Entry(t)
 		e.pack()
-		ttk.Label(t,text="",padding = [0,5,0,5]).pack()
+		empty_l = ttk.Label(t,text="",padding = [0,5,0,5])
+		empty_l.config(background="#d9d9d9")
+		empty_l.pack()
 		button = ttk.Button(t, text="Salva", command = Salva)
 		button.pack()
-		return
+		t.grab_set()
+		self.root.wait_window(t)

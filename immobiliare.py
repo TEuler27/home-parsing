@@ -162,20 +162,26 @@ class Immobiliare:
 			if widget.winfo_class() != "Menu":
 				widget.destroy()
 		modulo_l = ttk.Label(frame, text="Immobiliare:", padding=[0,10,0,10], font='Arial 15 bold')
+		modulo_l.config(background="#d9d9d9")
 		modulo_l.pack()
 		ven_aff_l = ttk.Label(frame, text="Vendita/Affitto:", padding = [0,0,0,10], font = 'Arial 10')
+		ven_aff_l.config(background="#d9d9d9")
 		self.ven_aff_c = ttk.Combobox(frame, state = 'readonly')
 		self.ven_aff_c['values'] = ["Vendita", "Affitto"]
 		regioni_l = ttk.Label(frame, text="Regioni:", padding = [0,10,0,10], font = 'Arial 10')
+		regioni_l.config(background="#d9d9d9")
 		self.regioni_c = ttk.Combobox(frame, state = 'readonly')
 		self.regioni_c['values'] = self.regioni
 		province_l = ttk.Label(frame, text="Provincia:", padding = [0,10,0,10], font = 'Arial 10')
+		province_l.config(background="#d9d9d9")
 		self.province_c = ttk.Combobox(frame, state = 'readonly')
 		self.province_c['values'] = []
 		comuni_l = ttk.Label(frame, text="Comune:", padding = [0,10,0,10], font = 'Arial 10')
+		comuni_l.config(background="#d9d9d9")
 		self.comuni_c = ttk.Combobox(frame, state = 'readonly')
 		self.comuni_c['values'] = []
 		zone_localita_l = ttk.Label(frame, text="Zona/Località:", padding = [0,10,0,10], font = 'Arial 10')
+		zone_localita_l.config(background="#d9d9d9")
 		self.zone_localita_c = ttk.Combobox(frame, state = 'readonly')
 		self.zone_localita_c['values'] = []
 		self.regioni_c.bind("<<ComboboxSelected>>", self.getProvince)
@@ -197,7 +203,9 @@ class Immobiliare:
 		self.comuni_c.pack()
 		zone_localita_l.pack()
 		self.zone_localita_c.pack()
-		ttk.Label(frame, text="", padding = [0,5,0,5]).pack()
+		empty_l = ttk.Label(frame, text="", padding = [0,5,0,5])
+		empty_l.config(background="#d9d9d9")
+		empty_l.pack()
 		button = ttk.Button(frame, text="Scarica", command = lambda: threading.Thread(target=self.Magia).start())
 		button.pack()
 
@@ -212,6 +220,7 @@ class Immobiliare:
 		t = tk.Toplevel(self.root,background="#d9d9d9")
 		t.geometry("350x80")
 		label = ttk.Label(t,text="Scaricamento in corso dei dati, attendere prego",padding = [0,10,0,10])
+		label.config(background="#d9d9d9")
 		label.pack()
 		self.bar = ttk.Progressbar(t,mode = 'determinate', length = "250", maximum = len(lista))
 		self.bar.pack()
