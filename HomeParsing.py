@@ -21,7 +21,7 @@ class HomeParsing(object):
 			self.root = tk.Tk()
 			self.root.configure(background="#d9d9d9")
 			self.root.title("HomeParsing")
-			self.root.geometry("500x500")
+			self.root.geometry("500x600")
 			menubar = Menu(self.root, relief="flat", bd = 2)
 			filemenu = Menu(menubar, tearoff=0)
 			moduli = json.loads(open("moduli.json").read())
@@ -95,6 +95,7 @@ class HomeParsing(object):
 	def ExtractAnnunci(self,indirizzo,funzione,next,referer):
 		def restart():
 			w.destroy()
+		indirizzo_start = indirizzo
 		t = tk.Toplevel(self.root)
 		t.configure(background="#d9d9d9")
 		t.geometry("350x80")
@@ -130,7 +131,6 @@ class HomeParsing(object):
 			pagina = pq(pagina_vergine)
 			lista += funzione(pagina)
 			indirizzo = indirizzo_n
-		lista += funzione(pagina)
 		t.destroy()
 		return lista
 

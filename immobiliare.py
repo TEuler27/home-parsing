@@ -106,7 +106,7 @@ def agency(pagina):
 def description(pagina):
 	#qua metti il selettore
 	testo = pagina(".description-text")
-	return testo.text().replace("\n"," ").replace("|","-")
+	return testo.text().replace("\n"," ").replace("|","-").replace('"','')
 
 def links(pagina):
 	#qua metti il selettore
@@ -115,9 +115,11 @@ def links(pagina):
 	for a in url("a").items():
 		href = a.attr("href")
 		if "http" not in href:
-			lista.append("https://www.immobiliare.it"+href)
+			if "https://www.immobiliare.it"+href not in lista:
+				lista.append("https://www.immobiliare.it"+href)
 		elif "agenzie_immobiliari" not in href:
-			lista.append(href)
+			if href not in lista:
+				lista.append(href)
 	return lista
 
 
@@ -129,11 +131,22 @@ def nextPage(pagina,indirizzo):
 		return False
 	else:
 		if "pag=" in indirizzo:
-			this = indirizzo.split("=")
-			this[-1] = int(this[-1])+1
-			this[-1] = str(this[-1])
-			return "=".join(this)
-
+			pezzi = indirizzo.split("?")
+			pezzi_parametri = pezzi[1].split("&")
+			parametri = {}
+			for pezzo in pezzi_parametri:
+				if len(pezzo.split("=")) > 1:
+					parametri[pezzo.split("=")[0]] = pezzo.split("=")[1]
+				else:
+					parametri[pezzo.split("=")[0]] = ""
+			parametri["pag"] = int(parametri["pag"])
+			parametri["pag"] += 1
+			parametri["pag"] = str(parametri["pag"])
+			link_finale = pezzi[0]+"?"
+			for par in parametri:
+				stringa = par + "=" + parametri[par] + "&"
+				link_finale += stringa
+			return link_finale
 		else:
 			return indirizzo+"&pag=2"
 
@@ -157,6 +170,11 @@ class Immobiliare:
 		self.bar = False
 
 	def GenerateWindow(self):
+		def show_menu(e):
+			w = e.widget
+			the_menu.entryconfigure("Incolla",
+			command=lambda: w.event_generate("<<Paste>>"))
+			the_menu.tk.call("tk_popup", the_menu, e.x_root, e.y_root)
 		frame = self.root
 		for widget in frame.winfo_children():
 			if widget.winfo_class() != "Menu":
@@ -208,6 +226,48 @@ class Immobiliare:
 		empty_l.pack()
 		button = ttk.Button(frame, text="Scarica", command = lambda: threading.Thread(target=self.Magia).start())
 		button.pack()
+		pers_tit_l = ttk.Label(frame, text="Ricerca personalizzata:", padding=[0,15,0,15], font='Arial 13 bold')
+		pers_tit_l.config(background="#d9d9d9")
+		pers_tit_l.pack()
+		pers_l = ttk.Label(frame,wraplength=450, text="Per effettuare una ricerca personalizzata fate la ricerca su immobiliare.it e copiate il link della pagina con gli annunci trovati in questo campo.", padding=[0,10,0,10])
+		pers_l.config(background="#d9d9d9")
+		pers_l.pack()
+		self.pers = ttk.Entry(frame)
+		self.pers.pack()
+		the_menu = Menu(frame, tearoff=0)
+		the_menu.add_command(label="Incolla")
+		self.pers.bind("<Button-3>", show_menu)
+		empty_l = ttk.Label(frame, text="", padding = [0,5,0,5])
+		empty_l.config(background="#d9d9d9")
+		empty_l.pack()
+		button_pers = ttk.Button(frame, text="Scarica", command = lambda: threading.Thread(target=self.MagiaPers).start())
+		button_pers.pack()
+
+	def MagiaPers(self):
+		session = requests.Session()
+		link = self.pers.get()
+		Hp = HomeParsing(1,self.root)
+		Hp.setSession(session)
+		lista = Hp.ExtractAnnunci(link,self.funzione,nextPage,False)
+		t = tk.Toplevel(self.root,background="#d9d9d9")
+		t.geometry("350x80")
+		label = ttk.Label(t,text="Scaricamento in corso dei dati, attendere prego",padding = [0,10,0,10])
+		label.config(background="#d9d9d9")
+		label.pack()
+		self.bar = ttk.Progressbar(t,mode = 'determinate', length = "250", maximum = len(lista))
+		self.bar.pack()
+		file = open("opzioni.json","r", encoding="utf-8")
+		preferenze = json.loads(file.read())
+		file.close()
+		nomefile = preferenze["path"]+"Immobiliare-"+time.strftime("%d-%m__%H-%M")+".csv"
+		legenda = "Indirizzo|Citta|Zona|Prezzo|Superficie|Locali|Bagni|Box Auto|Piano|Spese condominiali|Agenzia immobiliare|Descrizione|URL"
+		file = open(nomefile,"w", encoding="utf-8")
+		file.write(legenda+"\n")
+		file.close()
+		for url in lista:
+			Hp.ExtractData(url,nomefile,self.funzioni,False)
+			self.bar.step()
+		t.destroy()
 
 	def Magia(self):
 		session = requests.Session()
@@ -247,6 +307,9 @@ class Immobiliare:
 				self.province[provincia["nome"]] = provincia["idProvincia"]
 				province += [provincia["nome"]]
 		self.province_c['value'] = sorted(province)
+		self.province_c.set("")
+		self.comuni_c.set("")
+		self.zone_localita_c.set("")
 
 	def getComuni(self,event):
 		self.provincia = event.widget.get()
@@ -260,6 +323,8 @@ class Immobiliare:
 			self.comuni[comune["nome"]] = {"idComune": comune["idComune"], "conZone": comune["conZone"], "conLocalita": comune["conLocalita"], "keyurl": comune["keyurl"]}
 			comuni += [comune["nome"]]
 		self.comuni_c["value"] = sorted(comuni)
+		self.comuni_c.set("")
+		self.zone_localita_c.set("")
 
 	def getZoneLocalita(self,event):
 		self.comune = event.widget.get()
@@ -274,6 +339,10 @@ class Immobiliare:
 				self.zone[json_data["result"][idZona]['macrozona_nome_sn']] = json_data["result"][idZona]['macrozona_keyurl']
 				zone += [json_data["result"][idZona]['macrozona_nome_sn']]
 			self.zone_localita_c["value"] = sorted(zone)
+			self.zone_localita_c.set("")
+		else:
+			self.zone_localita_c["value"] = []
+			self.zone_localita_c.set("")
 		"""if self.comuni[self.comune]["conLocalita"]:
 			pagina = pq(request.urlopen("https://www.immobiliare.it/vendita-case/"+self.comuni[self.comune]["keyurl"].lower().replace("_","-")).read().decode("utf8"))
 			self.localita = []

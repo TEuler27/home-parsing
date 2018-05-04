@@ -91,7 +91,7 @@ def agency(pagina):
 def description(pagina):
 	#qua metti il selettore
 	testo = pagina(".adCommentsLanguage")
-	return testo.text().replace("\n"," ").replace("|","-")
+	return testo.text().replace("\n"," ").replace("|","-").replace('"','')
 
 def links(pagina):
 	#qua metti il selettore
@@ -112,13 +112,25 @@ def nextPage(pagina,indirizzo):
 		return False
 	else:
 		if "lista-" in indirizzo:
-			url_spezzato = indirizzo[0:-4].split("-")
-			url_spezzato[-1] = int(url_spezzato[-1])+1
-			url_spezzato[-1] = str(url_spezzato[-1])
-			return "-".join(url_spezzato)+".htm"
-
+			if "?" in indirizzo:
+				url_spezzato = indirizzo.split("?")
+				url_spezzato2 = url_spezzato[0].split("-")
+			else:
+				url_spezzato2 = indirizzo.split("-")
+			url_spezzato2[-1] = int(url_spezzato2[-1])+1
+			url_spezzato2[-1] = str(url_spezzato2[-1])
+			if "?" in indirizzo:
+				url_spezzato[0] = "-".join(url_spezzato2)
+				return "?".join(url_spezzato)
+			else:
+				return "-".join(url_spezzato2)
 		else:
-			return indirizzo+"lista-2.htm"
+			if "?" in indirizzo:
+				url_spezzato = indirizzo.split("?")
+				url_spezzato[0] += "lista-2"
+				return "?".join(url_spezzato)
+			else:
+				return indirizzo+"lista-2.htm"
 
 
 class Idealista:
@@ -138,6 +150,11 @@ class Idealista:
 		self.headers = preferenze["idealista-header"]
 
 	def GenerateWindow(self):
+		def show_menu(e):
+			w = e.widget
+			the_menu.entryconfigure("Incolla",
+			command=lambda: w.event_generate("<<Paste>>"))
+			the_menu.tk.call("tk_popup", the_menu, e.x_root, e.y_root)
 		file = open("opzioni.json","r", encoding="utf-8")
 		preferenze = json.loads(file.read())
 		file.close()
@@ -156,7 +173,6 @@ class Idealista:
 		province_l = ttk.Label(frame, text="Provincia:", padding = [0,10,0,10], font = 'Arial 10')
 		province_l.config(background="#d9d9d9")
 		self.province_c = ttk.Combobox(frame, state = 'readonly')
-		self.province_c['values'] = self.getProvince()
 		comuni_l = ttk.Label(frame, text="Comune:", padding = [0,10,0,10], font = 'Arial 10')
 		comuni_l.config(background="#d9d9d9")
 		self.comuni_c = ttk.Combobox(frame, state = 'readonly')
@@ -186,6 +202,53 @@ class Idealista:
 		empty_l.pack()
 		button = ttk.Button(frame, text="Scarica", command = lambda: threading.Thread(target=self.Magia).start())
 		button.pack()
+		pers_tit_l = ttk.Label(frame, text="Ricerca personalizzata:", padding=[0,15,0,15], font='Arial 13 bold')
+		pers_tit_l.config(background="#d9d9d9")
+		pers_tit_l.pack()
+		pers_l = ttk.Label(frame,wraplength=450, text="Per effettuare una ricerca personalizzata fate la ricerca su immobiliare.it e copiate il link della pagina con gli annunci trovati in questo campo.", padding=[0,10,0,10])
+		pers_l.config(background="#d9d9d9")
+		pers_l.pack()
+		self.pers = ttk.Entry(frame)
+		self.pers.pack()
+		the_menu = Menu(frame, tearoff=0)
+		the_menu.add_command(label="Incolla")
+		self.pers.bind("<Button-3>", show_menu)
+		empty_l = ttk.Label(frame, text="", padding = [0,5,0,5])
+		empty_l.config(background="#d9d9d9")
+		empty_l.pack()
+		button_pers = ttk.Button(frame, text="Scarica", command = lambda: threading.Thread(target=self.MagiaPers).start())
+		button_pers.pack()
+		self.province_c['values'] = self.getProvince()
+
+	def MagiaPers(self):
+		session = requests.Session()
+		file = open("opzioni.json","r", encoding="utf-8")
+		preferenze = json.loads(file.read())
+		file.close()
+		session.headers.update(self.headers)
+		link = self.pers.get()
+		Hp = HomeParsing(1,self.root)
+		Hp.setSession(session)
+		lista = Hp.ExtractAnnunci(link,self.funzione,nextPage,"https://www.idealista.it")
+		t = tk.Toplevel(self.root,background="#d9d9d9")
+		t.geometry("350x80")
+		label = ttk.Label(t,text="Scaricamento in corso dei dati, attendere prego",padding = [0,10,0,10])
+		label.config(background="#d9d9d9")
+		label.pack()
+		self.bar = ttk.Progressbar(t,mode = 'determinate', length = "250", maximum = len(lista))
+		self.bar.pack()
+		nomefile = preferenze["path"]+"Idealista-"+time.strftime("%d-%m__%H-%M")+".csv"
+		legenda = "Indirizzo|Prezzo|Superficie|Locali|Bagni|Box Auto|Piano|Ascensore|Spese condominiali|Agenzia immobiliare|Descrizione|URL"
+		file = open(nomefile,"w", encoding="utf-8")
+		file.write(legenda+"\n")
+		file.close()
+		for n in range(len(lista)):
+			if n != 0:
+				Hp.ExtractData(lista[n],nomefile,self.funzioni,lista[n-1])
+			else:
+				Hp.ExtractData(lista[n],nomefile,self.funzioni,False)
+			self.bar.step()
+		t.destroy()
 
 	def Magia(self):
 		session = requests.Session()
@@ -245,6 +308,9 @@ class Idealista:
 			if li.text() == "--":
 				break
 			province.append(li.text())
+		self.province_c.set("")
+		self.comuni_c.set("")
+		self.zone_localita_c.set("")
 		return province
 
 	def getComuni(self,event):
@@ -293,6 +359,8 @@ class Idealista:
 			for li_interno in li("ul > li").items():
 				comuni.append(li_interno("a").text())
 		self.comuni_c["value"] = sorted(comuni)
+		self.comuni_c.set("")
+		self.zone_localita_c.set("")
 
 	def getZoneLocalita(self,event):
 		def restart():
@@ -321,7 +389,12 @@ class Idealista:
 			if li("strong").text() == self.comune:
 				for li_interno in li("ul > li").items():
 					zone.append(li_interno("a").text())
-		self.zone_localita_c["value"] = sorted(zone)
+		if len(zone) != 0:
+			self.zone_localita_c["value"] = sorted(zone)
+			self.zone_localita_c.set("")
+		else:
+			self.zone_localita_c["value"] = []
+			self.zone_localita_c.set("")
 
 	def BuildLink(self):
 		if self.ven_aff == "":
