@@ -205,7 +205,7 @@ class Idealista:
 		pers_tit_l = ttk.Label(frame, text="Ricerca personalizzata:", padding=[0,15,0,15], font='Arial 13 bold')
 		pers_tit_l.config(background="#d9d9d9")
 		pers_tit_l.pack()
-		pers_l = ttk.Label(frame,wraplength=450, text="Per effettuare una ricerca personalizzata fate la ricerca su immobiliare.it e copiate il link della pagina con gli annunci trovati in questo campo.", padding=[0,10,0,10])
+		pers_l = ttk.Label(frame,wraplength=450, text="Per effettuare una ricerca personalizzata fate la ricerca su idealista.it e copiate il link della pagina con gli annunci trovati in questo campo.", padding=[0,10,0,10])
 		pers_l.config(background="#d9d9d9")
 		pers_l.pack()
 		self.pers = ttk.Entry(frame)
