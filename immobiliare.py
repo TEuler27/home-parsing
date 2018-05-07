@@ -150,6 +150,17 @@ def nextPage(pagina,indirizzo):
 		else:
 			return indirizzo+"&pag=2"
 
+def data(pagina):
+	parametro = pagina("dl.col-xs-12")
+	for table in parametro.items():
+		lista = table.text().split("\n")
+		if "Riferimento e Data annuncio" in lista:
+			indice = lista.index("Riferimento e Data annuncio")+1
+			elementi = lista[indice].split("-")[-1].strip()
+			return elementi
+	return ""
+
+
 
 class Immobiliare:
 
@@ -165,7 +176,7 @@ class Immobiliare:
 		self.zone = {}
 		self.ven_aff = ""
 		self.localita = []
-		self.funzioni = [geo,country,zone,price,sup,room,wc,auto,floor,cash,agency,description]
+		self.funzioni = [data,geo,country,zone,price,sup,room,wc,auto,floor,cash,agency,description]
 		self.funzione = links
 		self.bar = False
 
@@ -260,7 +271,7 @@ class Immobiliare:
 		preferenze = json.loads(file.read())
 		file.close()
 		nomefile = preferenze["path"]+"Immobiliare-"+time.strftime("%d-%m__%H-%M")+".csv"
-		legenda = "Indirizzo|Citta|Zona|Prezzo|Superficie|Locali|Bagni|Box Auto|Piano|Spese condominiali|Agenzia immobiliare|Descrizione|URL"
+		legenda = "Data annuncio|Indirizzo|Citta|Zona|Prezzo|Superficie|Locali|Bagni|Box Auto|Piano|Spese condominiali|Agenzia immobiliare|Descrizione|URL"
 		file = open(nomefile,"w", encoding="utf-8")
 		file.write(legenda+"\n")
 		file.close()
@@ -288,7 +299,7 @@ class Immobiliare:
 		preferenze = json.loads(file.read())
 		file.close()
 		nomefile = preferenze["path"]+"Immobiliare-"+time.strftime("%d-%m__%H-%M")+".csv"
-		legenda = "Indirizzo|Citta|Zona|Prezzo|Superficie|Locali|Bagni|Box Auto|Piano|Spese condominiali|Agenzia immobiliare|Descrizione|URL"
+		legenda = "Data annuncio|Indirizzo|Citta|Zona|Prezzo|Superficie|Locali|Bagni|Box Auto|Piano|Spese condominiali|Agenzia immobiliare|Descrizione|URL"
 		file = open(nomefile,"w", encoding="utf-8")
 		file.write(legenda+"\n")
 		file.close()
