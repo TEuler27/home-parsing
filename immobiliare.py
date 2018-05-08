@@ -10,7 +10,10 @@ import threading
 import requests
 
 def upperfirst(x):
-	return x[0].upper() + x[1:]
+	if len(x) > 0:
+		return x[0].upper() + x[1:]
+	else:
+		return ""
 
 def price(pagina):
 	#qua metti il selettore
@@ -156,7 +159,10 @@ def data(pagina):
 		lista = table.text().split("\n")
 		if "Riferimento e Data annuncio" in lista:
 			indice = lista.index("Riferimento e Data annuncio")+1
-			elementi = lista[indice].split("-")[-1].strip()
+			if "-" in lista[indice]:
+				elementi = lista[indice].split("-")[-1].strip()
+			else:
+				elementi = lista[indice].split(",")[-1].strip()
 			return elementi
 	return ""
 
@@ -232,6 +238,11 @@ class Immobiliare:
 		self.comuni_c.pack()
 		zone_localita_l.pack()
 		self.zone_localita_c.pack()
+		data_l = ttk.Label(frame,wraplength=450, text="A partire dal (GG/MM/AAAA):", padding=[0,10,0,10])
+		data_l.config(background="#d9d9d9")
+		data_l.pack()
+		self.data = ttk.Entry(frame)
+		self.data.pack()
 		empty_l = ttk.Label(frame, text="", padding = [0,5,0,5])
 		empty_l.config(background="#d9d9d9")
 		empty_l.pack()
@@ -245,6 +256,11 @@ class Immobiliare:
 		pers_l.pack()
 		self.pers = ttk.Entry(frame)
 		self.pers.pack()
+		data_pers_l = ttk.Label(frame,wraplength=450, text="A partire dal (GG/MM/AAAA):", padding=[0,10,0,10])
+		data_pers_l.config(background="#d9d9d9")
+		data_pers_l.pack()
+		self.data_pers = ttk.Entry(frame)
+		self.data_pers.pack()
 		the_menu = Menu(frame, tearoff=0)
 		the_menu.add_command(label="Incolla")
 		self.pers.bind("<Button-3>", show_menu)
@@ -257,6 +273,7 @@ class Immobiliare:
 	def MagiaPers(self):
 		session = requests.Session()
 		link = self.pers.get()
+		data = self.data_pers.get()
 		Hp = HomeParsing(1,self.root)
 		Hp.setSession(session)
 		lista = Hp.ExtractAnnunci(link,self.funzione,nextPage,False)
@@ -276,13 +293,14 @@ class Immobiliare:
 		file.write(legenda+"\n")
 		file.close()
 		for url in lista:
-			Hp.ExtractData(url,nomefile,self.funzioni,False)
+			Hp.ExtractData(url,nomefile,self.funzioni,False,data)
 			self.bar.step()
 		t.destroy()
 
 	def Magia(self):
 		session = requests.Session()
 		link = self.BuildLink()
+		data = self.data.get()
 		if not link:
 			return
 		Hp = HomeParsing(1,self.root)
@@ -304,7 +322,7 @@ class Immobiliare:
 		file.write(legenda+"\n")
 		file.close()
 		for url in lista:
-			Hp.ExtractData(url,nomefile,self.funzioni,False)
+			Hp.ExtractData(url,nomefile,self.funzioni,False,data)
 			self.bar.step()
 		t.destroy()
 

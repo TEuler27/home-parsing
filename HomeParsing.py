@@ -5,6 +5,7 @@ from tkinter import Menu, ttk, filedialog
 from importlib import import_module
 import json
 import functools
+import datetime
 
 
 class HomeParsing(object):
@@ -21,7 +22,7 @@ class HomeParsing(object):
 			self.root = tk.Tk()
 			self.root.configure(background="#d9d9d9")
 			self.root.title("HomeParsing")
-			self.root.geometry("500x600")
+			self.root.geometry("500x700")
 			menubar = Menu(self.root, relief="flat", bd = 2)
 			filemenu = Menu(menubar, tearoff=0)
 			moduli = json.loads(open("moduli.json").read())
@@ -134,7 +135,9 @@ class HomeParsing(object):
 		t.destroy()
 		return lista
 
-	def ExtractData(self,indirizzo,nome_doc,funzioni, referer):
+	def ExtractData(self,indirizzo,nome_doc,funzioni, referer, data = False):
+		if data:
+			time_data = datetime.datetime.strptime(data, "%d/%m/%Y").timestamp()
 		def restart():
 			w.destroy()
 		if not referer:
@@ -163,7 +166,14 @@ class HomeParsing(object):
 		for i in range(len(funzioni)):
 			dato = funzioni[i](pagina)
 			if(i == 0):
-				dati = dato
+				if not data:
+					dati = dato
+				else:
+					time_ann = datetime.datetime.strptime(dato, "%d/%m/%Y").timestamp()
+					if time_ann >= time_data:
+						dati = dato
+					else:
+						return
 			else:
 				dati += "|" + dato
 		dati += "|" + indirizzo

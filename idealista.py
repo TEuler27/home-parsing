@@ -9,7 +9,10 @@ from HomeParsing import *
 import threading
 
 def upperfirst(x):
-	return x[0].upper() + x[1:]
+	if len(x) > 0:
+		return x[0].upper() + x[1:]
+	else:
+		return ""
 
 def price(pagina):
 	#qua metti il selettore
