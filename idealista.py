@@ -120,8 +120,8 @@ def nextPage(pagina,indirizzo):
 				url_spezzato2 = url_spezzato[0].split("-")
 			else:
 				url_spezzato2 = indirizzo.split("-")
-			url_spezzato2[-1] = int(url_spezzato2[-1])+1
-			url_spezzato2[-1] = str(url_spezzato2[-1])
+			url_spezzato2[-1] = int(url_spezzato2[-1][:-4])+1
+			url_spezzato2[-1] = str(url_spezzato2[-1])+".htm"
 			if "?" in indirizzo:
 				url_spezzato[0] = "-".join(url_spezzato2)
 				return "?".join(url_spezzato)
