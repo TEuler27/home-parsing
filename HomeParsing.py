@@ -22,7 +22,7 @@ class HomeParsing(object):
 			self.root = tk.Tk()
 			self.root.configure(background="#d9d9d9")
 			self.root.title("HomeParsing")
-			self.root.geometry("500x700")
+			self.root.geometry("500x800")
 			menubar = Menu(self.root, relief="flat", bd = 2)
 			filemenu = Menu(menubar, tearoff=0)
 			moduli = json.loads(open("moduli.json").read())
