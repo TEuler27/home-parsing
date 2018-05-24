@@ -31,8 +31,8 @@ def price(pagina):
 def sup(pagina):
 	#qua metti il selettore
 	oggetto = pagina(".block__features-anction > .feature-action__features")
-	numeri = len(oggetto("strong"))
-	return oggetto("strong").eq(numeri-1).text().replace(".","")
+	numeri = oggetto(".features__only-text")
+	return numeri(".text-bold").text()
 
 def geo(pagina):
 	#qua metti il selettore
@@ -56,18 +56,23 @@ def zone(pagina):
 def room(pagina):
 	#qua metti il selettore
 	parametro = pagina(".block__features-anction > .feature-action__features")
-	for li in parametro("li").items():
-		if li("i").hasClass("rooms"):
-			return li("strong").text()
+	numeri = parametro("div")
+	for oggetto in numeri:
+		if numeri("i").hasClass("rooms"):
+			return numeri(".text-bold").text().split(" ")[0]
+		return ""
 	return ""
 
 def wc(pagina):
 	#qua metti il selettore
 	parametro = pagina(".block__features-anction > .feature-action__features")
-	for li in parametro("li").items():
-		if li("i").hasClass("bathrooms"):
-			return li("strong").text()
+	numeri = parametro("div")
+	for oggetto in numeri:
+		if numeri("i").hasClass("bathrooms"):
+			return numeri(".text-bold").text().split(" ")[1]
+		return ""
 	return ""
+
 
 def auto(pagina):
 	#qua metti il selettore
