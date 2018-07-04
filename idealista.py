@@ -80,7 +80,7 @@ def lift(pagina):
 
 def cash(pagina):
 	#qua metti il selettore
-	parametro = pagina(".display-table_cell")
+	parametro = pagina(".price-features__container")
 	for p in parametro("p").items():
 		if "spese condominiali" in p.text():
 			return p.text().split(" ")[0]
