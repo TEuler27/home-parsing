@@ -58,20 +58,24 @@ def room(pagina):
 	parametro = pagina(".features__list")
 	numeri = parametro("div")
 	for oggetto in numeri:
-		if numeri("i").hasClass("rooms"):
-			return numeri(".text-bold").text().split(" ")[0]
+		if numeri("span").hasClass("text-bold"):
+			return numeri(".text-bold").text().split("&")[0][0]
 		return ""
 	return ""
 
 def wc(pagina):
 	#qua metti il selettore
-	parametro = pagina(".features__list")
-	numeri = parametro("div")
-	for oggetto in numeri:
-		if numeri("i").hasClass("bathrooms"):
-			return numeri(".text-bold").text().split(" ")[1]
-		return ""
+	parametro = pagina("dl.col-xs-12")
+	for merda in parametro.items():
+		lista = merda.text().split("\n")
+		print (lista)
+		if "Locali" in lista:
+			indice = lista.index("Locali")+1
+			for elemento in lista[indice].split(","):
+				if "bagn" in elemento:
+					return elemento[1:2]
 	return ""
+	#return ""
 
 
 def auto(pagina):
