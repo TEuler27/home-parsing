@@ -17,7 +17,7 @@ def upperfirst(x):
 
 def price(pagina):
 	#qua metti il selettore
-	oggetto = pagina(".features__price")
+	oggetto = pagina(".features__price-block > .features__price")
 	prezzo = oggetto.text()
 	if "€" in prezzo:
 		if "da" in prezzo:
@@ -30,16 +30,16 @@ def price(pagina):
 
 def sup(pagina):
 	#qua metti il selettore
-	oggetto = pagina(".block__features-anction > .feature-action__features")
+	oggetto = pagina(".features__list")
 	numeri = oggetto(".features__only-text")
 	return numeri(".text-bold").text()
 
-def geo(pagina):
+def indirizzo(pagina):
 	#qua metti il selettore
-	indirizzo = pagina(".maps-address > span")
-	return upperfirst(indirizzo.text().split(",")[0])
+	indirizzo = pagina(".im-address__content")
+	return upperfirst(indirizzo.text())
 
-def country(pagina):
+"""def country(pagina):
 	#qua metti il selettore
 	indirizzo = pagina(".maps-address > span")
 	return indirizzo.text().split(",")[-1].split("-")[0].lstrip()
@@ -51,11 +51,11 @@ def zone(pagina):
 	if len(zona)==2:
 		return zona[1].lstrip()
 	else:
-		return ""
+		return """""
 
 def room(pagina):
 	#qua metti il selettore
-	parametro = pagina(".block__features-anction > .feature-action__features")
+	parametro = pagina(".features__list")
 	numeri = parametro("div")
 	for oggetto in numeri:
 		if numeri("i").hasClass("rooms"):
@@ -65,7 +65,7 @@ def room(pagina):
 
 def wc(pagina):
 	#qua metti il selettore
-	parametro = pagina(".block__features-anction > .feature-action__features")
+	parametro = pagina(".features__list")
 	numeri = parametro("div")
 	for oggetto in numeri:
 		if numeri("i").hasClass("bathrooms"):
@@ -187,7 +187,7 @@ class Immobiliare:
 		self.zone = {}
 		self.ven_aff = ""
 		self.localita = []
-		self.funzioni = [data,geo,country,zone,price,sup,room,wc,auto,floor,cash,agency,description]
+		self.funzioni = [data,indirizzo,price,sup,room,wc,auto,floor,cash,agency,description]
 		self.funzione = links
 		self.bar = False
 
@@ -293,7 +293,7 @@ class Immobiliare:
 		preferenze = json.loads(file.read())
 		file.close()
 		nomefile = preferenze["path"]+"Immobiliare-"+time.strftime("%d-%m__%H-%M")+".csv"
-		legenda = "Data annuncio|Indirizzo|Citta|Zona|Prezzo|Superficie|Locali|Bagni|Box Auto|Piano|Spese condominiali|Agenzia immobiliare|Descrizione|URL"
+		legenda = "Data annuncio|Indirizzo|Prezzo|Superficie|Locali|Bagni|Box Auto|Piano|Spese condominiali|Agenzia immobiliare|Descrizione|URL"
 		file = open(nomefile,"w", encoding="utf-8")
 		file.write(legenda+"\n")
 		file.close()
@@ -322,7 +322,7 @@ class Immobiliare:
 		preferenze = json.loads(file.read())
 		file.close()
 		nomefile = preferenze["path"]+"Immobiliare-"+time.strftime("%d-%m__%H-%M")+".csv"
-		legenda = "Data annuncio|Indirizzo|Citta|Zona|Prezzo|Superficie|Locali|Bagni|Box Auto|Piano|Spese condominiali|Agenzia immobiliare|Descrizione|URL"
+		legenda = "Data annuncio|Indirizzo|Prezzo|Superficie|Locali|Bagni|Box Auto|Piano|Spese condominiali|Agenzia immobiliare|Descrizione|URL"
 		file = open(nomefile,"w", encoding="utf-8")
 		file.write(legenda+"\n")
 		file.close()
