@@ -15,7 +15,7 @@ def upperfirst(x):
 		return ""
 
 def price(pagina):
-	#qua metti il selettore
+	
 	oggetto = pagina(".info-data")(".txt-bold").eq(0)
 	prezzo = oggetto.text()
 	if "da" in prezzo:
@@ -25,7 +25,7 @@ def price(pagina):
 	return prezzo.replace(".","")
 
 def sup(pagina):
-	#qua metti il selettore
+	
 	oggetto = pagina(".info-features")
 	for span in oggetto("span").items():
 		if "m2" in span.text():
@@ -33,12 +33,12 @@ def sup(pagina):
 	return ""
 
 def geo(pagina):
-	#qua metti il selettore
+	
 	indirizzo = pagina("#headerMap")("ul")
 	return upperfirst(indirizzo.text().replace("\n","/"))
 
 def room(pagina):
-	#qua metti il selettore
+	
 	oggetto = pagina(".info-features")
 	for span in oggetto("span").items():
 		if "locali" in span.text() or "locale"in span.text():
@@ -46,7 +46,7 @@ def room(pagina):
 	return ""
 
 def wc(pagina):
-	#qua metti il selettore
+	
 	parametro = pagina(".details-property_features")
 	for li in parametro("ul > li").items():
 		if "bagni" in li.text() or "bagno" in li.text():
@@ -54,7 +54,7 @@ def wc(pagina):
 	return ""
 
 def auto(pagina):
-	#qua metti il selettore
+	
 	parametro = pagina(".details-property_features")
 	for li in parametro("ul > li").items():
 		if "Garage/posto auto" in li.text():
@@ -63,7 +63,7 @@ def auto(pagina):
 
 
 def floor(pagina):
-	#qua metti il selettore
+	
 	oggetto = pagina(".info-features")
 	for span in oggetto("span").items():
 		if "piano" in span.text() or "Piano" in span.text():
@@ -79,7 +79,7 @@ def lift(pagina):
 
 
 def cash(pagina):
-	#qua metti il selettore
+	
 	parametro = pagina(".price-features__container")
 	for p in parametro("p").items():
 		if "spese condominiali" in p.text():
@@ -87,17 +87,17 @@ def cash(pagina):
 	return ""
 
 def agency(pagina):
-	#qua metti il selettore
+	
 	pagina(".professional-name")("p").remove()
 	return pagina(".professional-name").text().replace("\n"," ")
 
 def description(pagina):
-	#qua metti il selettore
+	
 	testo = pagina(".adCommentsLanguage")
 	return testo.text().replace("\n"," ").replace("|","-").replace('"','')
 
 def links(pagina):
-	#qua metti il selettore
+	
 	url = pagina(".item-link")
 	lista = []
 	for a in url.items():

@@ -16,9 +16,12 @@ def upperfirst(x):
 		return ""
 
 def price(pagina):
-	#qua metti il selettore
+
 	oggetto = pagina(".features__price-block > .features__price")
 	prezzo = oggetto.text()
+	if "%" in prezzo:
+		oggetto = pagina(".features__price-old--price")
+		prezzo = oggetto.text()
 	if "€" in prezzo:
 		if "da" in prezzo:
 			return prezzo
@@ -29,23 +32,23 @@ def price(pagina):
 		return prezzo
 
 def sup(pagina):
-	#qua metti il selettore
+
 	oggetto = pagina(".features__list")
 	numeri = oggetto(".features__only-text")
 	return numeri(".text-bold").text()
 
 def indirizzo(pagina):
-	#qua metti il selettore
+
 	indirizzo = pagina(".im-address__content")
 	return upperfirst(indirizzo.text())
 
 """def country(pagina):
-	#qua metti il selettore
+
 	indirizzo = pagina(".maps-address > span")
 	return indirizzo.text().split(",")[-1].split("-")[0].lstrip()
 
 def zone(pagina):
-	#qua metti il selettore
+
 	indirizzo = pagina(".maps-address > span")
 	zona = indirizzo.text().split(",")[-1].split("-")
 	if len(zona)==2:
@@ -54,7 +57,7 @@ def zone(pagina):
 		return """""
 
 def room(pagina):
-	#qua metti il selettore
+
 	parametro = pagina(".features__list")
 	numeri = parametro("div")
 	for oggetto in numeri:
@@ -64,11 +67,10 @@ def room(pagina):
 	return ""
 
 def wc(pagina):
-	#qua metti il selettore
+
 	parametro = pagina("dl.col-xs-12")
-	for merda in parametro.items():
-		lista = merda.text().split("\n")
-		print (lista)
+	for tag in parametro.items():
+		lista = tag.text().split("\n")
 		if "Locali" in lista:
 			indice = lista.index("Locali")+1
 			for elemento in lista[indice].split(","):
@@ -79,7 +81,7 @@ def wc(pagina):
 
 
 def auto(pagina):
-	#qua metti il selettore
+
 	parametro = pagina("dl.col-xs-12")
 	for table in parametro.items():
 		lista = table.text().split("\n")
@@ -90,7 +92,7 @@ def auto(pagina):
 
 
 def floor(pagina):
-	#qua metti il selettore
+
 	parametro = pagina("dl.col-xs-12")
 	for table in parametro.items():
 		lista = table.text().split("\n")
@@ -100,7 +102,7 @@ def floor(pagina):
 	return ""
 
 def cash(pagina):
-	#qua metti il selettore
+
 	parametro = pagina("dl.col-xs-12")
 	for table in parametro.items():
 		lista = table.text().split("\n")
@@ -111,17 +113,17 @@ def cash(pagina):
 	return ""
 
 def agency(pagina):
-	#qua metti il selettore
+
 	nome = pagina(".contact-data__name")
 	return nome.eq(0).text().replace("|", " ")
 
 def description(pagina):
-	#qua metti il selettore
+
 	testo = pagina(".description-text")
 	return testo.text().replace("\n"," ").replace("|","-").replace('"','')
 
 def links(pagina):
-	#qua metti il selettore
+
 	url = pagina(".text-primary")
 	lista = []
 	for a in url("a").items():
