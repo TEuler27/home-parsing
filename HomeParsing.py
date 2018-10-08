@@ -165,7 +165,7 @@ class HomeParsing(object):
 		dati = ""
 		for i in range(len(funzioni)):
 			dato = funzioni[i](pagina)
-			if(i == 0):
+			if (i == 0):
 				if not data:
 					dati = dato
 				else:
