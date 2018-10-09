@@ -1,4 +1,4 @@
-﻿from pyquery import PyQuery as pq
+from pyquery import PyQuery as pq
 from urllib import request
 from tkinter import ttk
 import tkinter as tk
@@ -16,148 +16,103 @@ def upperfirst(x):
 		return ""
 
 def price(pagina):
-
-	oggetto = pagina(".pinfo-price")
+	oggetto = pagina(".immobilePrezzo")
 	if "Trattativa" in oggetto.text():
 		return oggetto.text()
-	prezzo = oggetto.text()[2:].replace(".","")
-	if oggetto("a").html() != None:
-		len_testo_eliminare = len(oggetto("a").text())
-		prezzo = prezzo[:-len_testo_eliminare]
-	if "al mese" in prezzo:
-		return prezzo[:-8]
-	else:
-		return prezzo
+	prezzo = oggetto.text().split(" ")
+	#if "al mese" in prezzo:
+	#	return prezzo[:-8]
+	return prezzo[1].replace(".","")
 
 def sup(pagina):
-
-	oggetto = pagina(".mtq")
-	return oggetto.text()
+	oggetto = pagina(".schedaAnnuncioCampi > div")
+	for div in oggetto.items():
+		if "Superficie" in div.text():
+			div("strong").remove()
+			return div.text().split(" ")[2]
+	return ""
 
 def indirizzo(pagina):
-
-	indirizzo = pagina(".zone")
-	return indirizzo.text()
+	oggetto = pagina(".schedaAnnuncioCampi > div")
+	for div in oggetto.items():
+		if "Indirizzo" in div.text():
+			div("strong").remove()
+			return div.text()[2:]
+	return ""
 
 def room(pagina):
-
-	parametro = pagina(".pinfo-characteristics > li")
-	numeri = parametro("span")
-	for oggetto in numeri.items():
-		if oggetto("i").hasClass("icon-locali"):
-			return oggetto.text()
+	oggetto = pagina(".schedaAnnuncioCampi > div")
+	for div in oggetto.items():
+		if "Locali" in div.text():
+			div("strong").remove()
+			return div.text()[2:]
 	return ""
 
 def wc(pagina):
-
-	parametro = pagina(".characteristics")
-	for li in parametro("li").items():
-		if "Bagni" in li.text():
-			li("b").remove()
-			return li.text()
+	oggetto = pagina(".schedaAnnuncioCampi > div")
+	for div in oggetto.items():
+		if "Bagni" in div.text():
+			div("strong").remove()
+			return div.text()[2:]
 	return ""
-
 
 def auto(pagina):
-
-	parametro = pagina(".characteristics")
-	for li in parametro("li").items():
-		if "Box" in li.text():
-			li("b").remove()
-			return li.text()
+	oggetto = pagina(".schedaAnnuncioCampi > div")
+	for div in oggetto.items():
+		if "Box" in div.text():
+			return div.text()[-2:]
 	return ""
 
-
-
 def floor(pagina):
-
-	parametro = pagina(".characteristics")
-	for li in parametro("li").items():
-		if "Piano" in li.text():
-			li("b").remove()
-			return li.text()
+	parametro = pagina(".schedaAnnuncioCampi > div")
+	for div in parametro.items():
+		if "Piano" in div.text():
+			div("strong").remove()
+			return div.text()[2:]
 	return ""
 
 def cash(pagina):
-
-	parametro = pagina(".characteristics")
-	for li in parametro("li").items():
-		if "Spese Cond. Mese" in li.text():
-			li("b").remove()
-			return li.text()
+	parametro = pagina(".schedaAnnuncioCampi > div")
+	for div in parametro.items():
+		if "Spese Annue" in div.text():
+			div("strong").remove()
+			spese_anno = div.text()[4:].replace(".","")
+			return str(round(int(spese_anno)/12))
 	return ""
 
 def agency(pagina):
-
-	if "Privato" in pagina(".agency-info").text():
-		return "Privato"
-	else:
-		return pagina(".name-agency").text().replace("|", " ")
-	# link = pagina(".agency-info")("a").attr("href")
-	# session = requests.Session()
-	# if "http" not in link:
-	# 	link = "https://www.casa.it" + link
-	# pagina_nuova = pq(session.get(link).text)
+	parametro = pagina(".affiliato > div")
+	nome = parametro("strong").text()
+	return nome
 
 def description(pagina):
-
-	testo = pagina(".description")
-	testo(".description-header").remove()
+	pagina(".CErow").remove()
+	testo = pagina(".schedaAnnuncioDescrizione")
 	return testo.text().replace("\n"," ").replace("|","-").replace('"','')
 
 def links(pagina):
-
-	url = pagina(".listing-list > li")
+	url = pagina(".immobileLink")
 	lista = []
 	for a in url("a").items():
 		href = a.attr("href")
-		if "http" not in href:
-			if "https://www.casa.it"+href not in lista:
-				lista.append("https://www.casa.it"+href)
+		lista.append(href)
+		# if "http" not in href:
+		# 	if "https://www.tecnocasa.it"+href not in lista:
+		# 		lista.append("https://www.tecnocasa.it"+href)
 	return lista
 
-
 def nextPage(pagina,indirizzo):
-	parti = indirizzo.split("?")
-	splitted = parti[0].split("-")
-	splitted[len(splitted)-1] = int(splitted[len(splitted)-1]) + 1
-	splitted[len(splitted)-1] = str(splitted[len(splitted)-1])
-	indirizzo_nuovo = "-".join(splitted)
-	session = requests.Session()
-	pagina_nuova = pq(session.get(indirizzo_nuovo).text)
-	if pagina_nuova(".no-results").html() == None:
-		return indirizzo_nuovo+"?"+parti[1]
-	else:
-		return False
+	blocco = pagina(".pagination > li ")
+	for li in blocco.items():
+		if ">" in li.text():
+			href = li("a").attr("href")
+			return href
+	return False
 
 def data(pagina):
-	try:
-		data_str = pagina(".last-mod").text()[14:]
-		print(data_str)
-		data_list = data_str.split(" ")
-		giorno = data_list[0]
-		if len(giorno) == 1:
-			giorno = "0" + giorno
-		mese = {
-	        'Gennaio' : "01",
-	        'Febbraio' : "02",
-	        'Marzo' : "03",
-	        'Aprile' : "04",
-	        'Maggio' : "05",
-	        'Giugno' : "06",
-	        'Luglio' : "07",
-	        'Agosto' : "08",
-	        'Settembre' : "09",
-	        'Ottobre' : "10",
-	        'Novembre' : "11",
-	        'Dicembre' : "12"
-		}[data_list[1]]
-		anno = data_list[2]
-		return giorno+"/"+mese+"/"+anno
-	except:
-		return ""
+	return ""
 
-class Casa:
+class Tecnocasa:
 
 	def __init__(self,root):
 		self.root = root
@@ -175,7 +130,7 @@ class Casa:
 		for widget in frame.winfo_children():
 			if widget.winfo_class() != "Menu":
 				widget.destroy()
-		modulo_l = ttk.Label(frame, text="Casa.it:", padding=[0,10,0,10], font='Arial 15 bold')
+		modulo_l = ttk.Label(frame, text="Tecnocasa:", padding=[0,10,0,10], font='Arial 15 bold')
 		modulo_l.config(background="#d9d9d9")
 		modulo_l.pack()
 		pers_tit_l = ttk.Label(frame, text="Ricerca personalizzata:", padding=[0,15,0,15], font='Arial 13 bold')
@@ -217,7 +172,7 @@ class Casa:
 		file = open("opzioni.json","r", encoding="utf-8")
 		preferenze = json.loads(file.read())
 		file.close()
-		nomefile = preferenze["path"]+"Casa-"+time.strftime("%d-%m__%H-%M")+".csv"
+		nomefile = preferenze["path"]+"Tecnocasa-"+time.strftime("%d-%m__%H-%M")+".csv"
 		legenda = "Data annuncio|Zona|Prezzo|Superficie|Locali|Bagni|Box Auto|Piano|Spese condominiali|Agenzia immobiliare|Descrizione|URL"
 		file = open(nomefile,"w", encoding="utf-8")
 		file.write(legenda+"\n")
