@@ -22,7 +22,7 @@ class HomeParsing(object):
 			self.root = tk.Tk()
 			self.root.configure(background="#d9d9d9")
 			self.root.title("HomeParsing")
-			self.root.geometry("500x800")
+			self.root.geometry("500x400")
 			menubar = Menu(self.root, relief="flat", bd = 2)
 			filemenu = Menu(menubar, tearoff=0)
 			moduli = json.loads(open("moduli.json").read())
@@ -161,6 +161,11 @@ class HomeParsing(object):
 			self.root.wait_window(w)
 			req = self.s.get(indirizzo)
 		pagina_vergine = req.text
+		if ".casa" in indirizzo and "Ops... pagina non trovata" in pagina_vergine:
+			self.ExtractData(indirizzo,nome_doc,funzioni, referer, data)
+			return
+		if "tecnocasa" in indirizzo and req.status_code == 404:
+			return
 		pagina = pq(pagina_vergine)
 		dati = ""
 		for i in range(len(funzioni)):

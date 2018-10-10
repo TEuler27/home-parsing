@@ -15,7 +15,7 @@ def upperfirst(x):
 		return ""
 
 def price(pagina):
-	
+
 	oggetto = pagina(".info-data")(".txt-bold").eq(0)
 	prezzo = oggetto.text()
 	if "da" in prezzo:
@@ -25,7 +25,7 @@ def price(pagina):
 	return prezzo.replace(".","")
 
 def sup(pagina):
-	
+
 	oggetto = pagina(".info-features")
 	for span in oggetto("span").items():
 		if "m2" in span.text():
@@ -33,12 +33,12 @@ def sup(pagina):
 	return ""
 
 def geo(pagina):
-	
+
 	indirizzo = pagina("#headerMap")("ul")
 	return upperfirst(indirizzo.text().replace("\n","/"))
 
 def room(pagina):
-	
+
 	oggetto = pagina(".info-features")
 	for span in oggetto("span").items():
 		if "locali" in span.text() or "locale"in span.text():
@@ -46,7 +46,7 @@ def room(pagina):
 	return ""
 
 def wc(pagina):
-	
+
 	parametro = pagina(".details-property_features")
 	for li in parametro("ul > li").items():
 		if "bagni" in li.text() or "bagno" in li.text():
@@ -54,7 +54,7 @@ def wc(pagina):
 	return ""
 
 def auto(pagina):
-	
+
 	parametro = pagina(".details-property_features")
 	for li in parametro("ul > li").items():
 		if "Garage/posto auto" in li.text():
@@ -63,7 +63,7 @@ def auto(pagina):
 
 
 def floor(pagina):
-	
+
 	oggetto = pagina(".info-features")
 	for span in oggetto("span").items():
 		if "piano" in span.text() or "Piano" in span.text():
@@ -79,7 +79,7 @@ def lift(pagina):
 
 
 def cash(pagina):
-	
+
 	parametro = pagina(".price-features__container")
 	for p in parametro("p").items():
 		if "spese condominiali" in p.text():
@@ -87,17 +87,17 @@ def cash(pagina):
 	return ""
 
 def agency(pagina):
-	
+
 	pagina(".professional-name")("p").remove()
 	return pagina(".professional-name").text().replace("\n"," ")
 
 def description(pagina):
-	
+
 	testo = pagina(".adCommentsLanguage")
 	return testo.text().replace("\n"," ").replace("|","-").replace('"','')
 
 def links(pagina):
-	
+
 	url = pagina(".item-link")
 	lista = []
 	for a in url.items():
@@ -170,41 +170,6 @@ class Idealista:
 		modulo_l = ttk.Label(frame, text="Idealista:", padding=[0,10,0,10], font='Arial 15 bold')
 		modulo_l.config(background="#d9d9d9")
 		modulo_l.pack()
-		ven_aff_l = ttk.Label(frame, text="Vendita/Affitto:", padding = [0,0,0,10], font = 'Arial 10')
-		self.ven_aff_c = ttk.Combobox(frame, state = 'readonly')
-		self.ven_aff_c['values'] = ["Vendita", "Affitto"]
-		province_l = ttk.Label(frame, text="Provincia:", padding = [0,10,0,10], font = 'Arial 10')
-		province_l.config(background="#d9d9d9")
-		self.province_c = ttk.Combobox(frame, state = 'readonly')
-		comuni_l = ttk.Label(frame, text="Comune:", padding = [0,10,0,10], font = 'Arial 10')
-		comuni_l.config(background="#d9d9d9")
-		self.comuni_c = ttk.Combobox(frame, state = 'readonly')
-		self.comuni_c['values'] = []
-		zone_localita_l = ttk.Label(frame, text="Zona/Località:", padding = [0,10,0,10], font = 'Arial 10')
-		zone_localita_l.config(background="#d9d9d9")
-		self.zone_localita_c = ttk.Combobox(frame, state = 'readonly')
-		self.zone_localita_c['values'] = []
-		self.province_c.bind("<<ComboboxSelected>>", self.getComuni)
-		self.comuni_c.bind("<<ComboboxSelected>>", self.getZoneLocalita)
-		def save_zona(event):
-			self.zona = event.widget.get()
-		self.zone_localita_c.bind("<<ComboboxSelected>>", save_zona)
-		def save_ven_aff(event):
-			self.ven_aff = event.widget.get()
-		self.ven_aff_c.bind("<<ComboboxSelected>>", save_ven_aff)
-		ven_aff_l.pack()
-		self.ven_aff_c.pack()
-		province_l.pack()
-		self.province_c.pack()
-		comuni_l.pack()
-		self.comuni_c.pack()
-		zone_localita_l.pack()
-		self.zone_localita_c.pack()
-		empty_l = ttk.Label(frame, text="", padding = [0,5,0,5])
-		empty_l.config(background="#d9d9d9")
-		empty_l.pack()
-		button = ttk.Button(frame, text="Scarica", command = lambda: threading.Thread(target=self.Magia).start())
-		button.pack()
 		pers_tit_l = ttk.Label(frame, text="Ricerca personalizzata:", padding=[0,15,0,15], font='Arial 13 bold')
 		pers_tit_l.config(background="#d9d9d9")
 		pers_tit_l.pack()
@@ -221,7 +186,6 @@ class Idealista:
 		empty_l.pack()
 		button_pers = ttk.Button(frame, text="Scarica", command = lambda: threading.Thread(target=self.MagiaPers).start())
 		button_pers.pack()
-		self.province_c['values'] = self.getProvince()
 
 	def MagiaPers(self):
 		session = requests.Session()
@@ -252,173 +216,6 @@ class Idealista:
 				Hp.ExtractData(lista[n],nomefile,self.funzioni,False)
 			self.bar.step()
 		t.destroy()
-
-	def Magia(self):
-		session = requests.Session()
-		file = open("opzioni.json","r", encoding="utf-8")
-		preferenze = json.loads(file.read())
-		file.close()
-		session.headers.update(self.headers)
-		link = self.BuildLink()
-		if not link:
-			return
-		Hp = HomeParsing(1,self.root)
-		Hp.setSession(session)
-		lista = Hp.ExtractAnnunci(link,self.funzione,nextPage,"https://www.idealista.it")
-		t = tk.Toplevel(self.root,background="#d9d9d9")
-		t.geometry("350x80")
-		label = ttk.Label(t,text="Scaricamento in corso dei dati, attendere prego",padding = [0,10,0,10])
-		label.config(background="#d9d9d9")
-		label.pack()
-		self.bar = ttk.Progressbar(t,mode = 'determinate', length = "250", maximum = len(lista))
-		self.bar.pack()
-		nomefile = preferenze["path"]+"Idealista-"+time.strftime("%d-%m__%H-%M")+".csv"
-		legenda = "Indirizzo|Prezzo|Superficie|Locali|Bagni|Box Auto|Piano|Ascensore|Spese condominiali|Agenzia immobiliare|Descrizione|URL"
-		file = open(nomefile,"w", encoding="utf-8")
-		file.write(legenda+"\n")
-		file.close()
-		for n in range(len(lista)):
-			if n != 0:
-				Hp.ExtractData(lista[n],nomefile,self.funzioni,lista[n-1])
-			else:
-				Hp.ExtractData(lista[n],nomefile,self.funzioni,False)
-			self.bar.step()
-		t.destroy()
-
-	def getProvince(self):
-		def restart():
-			w.destroy()
-		s = requests.Session()
-		s.headers.update(self.headers)
-		req = s.get("https://www.idealista.it/")
-		if req.status_code == 403:
-			w = tk.Toplevel(self.root)
-			w.configure(background="#d9d9d9")
-			w.title("Sblocco richiesto")
-			w.geometry("350x150")
-			label = ttk.Label(w,wraplength=300,text="Idealista ci ha negato l'accesso. Visita la home di idealista digitando l'indirizzo direttamente dalla barra dell'url del tuo browser preferito e clicca su \"non sono un robot\". Se non visualizzi il captcha svuota la cache e riprova.",padding = [0,10,0,10])
-			label.config(background="#d9d9d9")
-			label.pack()
-			button = ttk.Button(w, text="Riparti", command = restart)
-			button.pack()
-			w.update()
-			w.grab_set()
-			self.root.wait_window(w)
-			req = s.get("https://www.idealista.it/")
-		pagina = pq(req.text)
-		province = []
-		for li in pagina("#location-combo > li").items():
-			if li.text() == "--":
-				break
-			province.append(li.text())
-		self.province_c.set("")
-		self.comuni_c.set("")
-		self.zone_localita_c.set("")
-		return province
-
-	def getComuni(self,event):
-		def restart():
-			w.destroy()
-		self.provincia = event.widget.get()
-		s = requests.Session()
-		s.headers.update(self.headers)
-		if "-" in self.provincia:
-			req = s.get("https://www.idealista.it/vendita-case/"+self.provincia.lower().replace(" ", "-").replace("'","")+"/comuni")
-			if req.status_code == 403:
-				w = tk.Toplevel(self.root)
-				w.configure(background="#d9d9d9")
-				w.title("Sblocco richiesto")
-				w.geometry("350x150")
-				label = ttk.Label(w,wraplength=300,text="Idealista ci ha negato l'accesso. Visita la home di idealista digitando l'indirizzo direttamente dalla barra dell'url del tuo browser preferito e clicca su \"non sono un robot\". Se non visualizzi il captcha svuota la cache e riprova.",padding = [0,10,0,10])
-				label.config(background="#d9d9d9")
-				label.pack()
-				button = ttk.Button(w, text="Riparti", command = restart)
-				button.pack()
-				w.update()
-				w.grab_set()
-				self.root.wait_window(w)
-				req = s.get("https://www.idealista.it/vendita-case/"+self.provincia.lower().replace(" ", "-").replace("'","")+"/comuni")
-			pagina = pq(req.text)
-		else:
-			req = s.get("https://www.idealista.it/vendita-case/"+self.provincia.lower().replace(" ", "-").replace("'","")+"-provincia/comuni")
-			if req.status_code == 403:
-				w = tk.Toplevel(self.root)
-				w.configure(background="#d9d9d9")
-				w.title("Sblocco richiesto")
-				w.geometry("350x150")
-				label = ttk.Label(w,wraplength=300,text="Idealista ci ha negato l'accesso. Visita la home di idealista digitando l'indirizzo direttamente dalla barra dell'url del tuo browser preferito e clicca su \"non sono un robot\". Se non visualizzi il captcha svuota la cache e riprova.",padding = [0,10,0,10])
-				label.config(background="#d9d9d9")
-				label.pack()
-				button = ttk.Button(w, text="Riparti", command = restart)
-				button.pack()
-				w.update()
-				w.grab_set()
-				self.root.wait_window(w)
-				req = s.get("https://www.idealista.it/vendita-case/"+self.provincia.lower().replace(" ", "-").replace("'","")+"-provincia/comuni")
-			pagina = pq(req.text)
-		#self.comuni = {}
-		comuni = []
-		for li in pagina("#location_list > li").items():
-			for li_interno in li("ul > li").items():
-				comuni.append(li_interno("a").text())
-		self.comuni_c["value"] = sorted(comuni)
-		self.comuni_c.set("")
-		self.zone_localita_c.set("")
-
-	def getZoneLocalita(self,event):
-		def restart():
-			w.destroy()
-		self.comune = event.widget.get()
-		s = requests.Session()
-		s.headers.update(self.headers)
-		req = s.get("https://www.idealista.it/vendita-case/"+self.comune.lower().replace(" ", "-").replace("'","")+"-"+self.provincia.lower().replace(" ", "-").replace("'","")+"/")
-		if req.status_code == 403:
-			w = tk.Toplevel(self.root)
-			w.configure(background="#d9d9d9")
-			w.title("Sblocco richiesto")
-			w.geometry("350x150")
-			label = ttk.Label(w,wraplength=300,text="Idealista ci ha negato l'accesso. Visita la home di idealista digitando l'indirizzo direttamente dalla barra dell'url del tuo browser preferito e clicca su \"non sono un robot\". Se non visualizzi il captcha svuota la cache e riprova.",padding = [0,10,0,10])
-			label.config(background="#d9d9d9")
-			label.pack()
-			button = ttk.Button(w, text="Riparti", command = restart)
-			button.pack()
-			w.update()
-			w.grab_set()
-			self.root.wait_window(w)
-			req = s.get("https://www.idealista.it/vendita-case/"+self.comune.lower().replace(" ", "-").replace("'","")+"-"+self.provincia.lower().replace(" ", "-").replace("'","")+"/")
-		pagina = pq(req.text)
-		zone = []
-		for li in pagina(".breadcrumb-subitems > ul")("li").items():
-			if li("strong").text() == self.comune:
-				for li_interno in li("ul > li").items():
-					zone.append(li_interno("a").text())
-		if len(zone) != 0:
-			self.zone_localita_c["value"] = sorted(zone)
-			self.zone_localita_c.set("")
-		else:
-			self.zone_localita_c["value"] = []
-			self.zone_localita_c.set("")
-
-	def BuildLink(self):
-		if self.ven_aff == "":
-			a = messagebox.showerror("Errore", "Alcuni dati sono mancanti")
-			return False
-		if self.provincia == "":
-			messagebox.showerror("Errore", "Alcuni dati sono mancanti")
-			return False
-		link = "https://www.idealista.it/"
-		if self.ven_aff == "Vendita":
-			link += "vendita-case/"
-		else:
-			link += "affitto-case/"
-		if self.comune != "" and self.zona == "":
-			return link+self.comune.lower().replace(" ", "-")+"-"+self.provincia.lower().replace(" ","-")+"/"
-		if self.zona != "":
-			return link+self.comune.lower().replace(" ", "-")+"/"+self.zona.lower().replace(" ","-")+"/"
-		if "-" in self.provincia:
-			return link+self.provincia.lower().replace(" ","-")+"/"
-		else:
-			return link+self.provincia.lower().replace(" ","-")+"-provincia/"
 
 	def askHeader(self):
 		def Salva():

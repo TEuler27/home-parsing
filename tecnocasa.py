@@ -20,8 +20,6 @@ def price(pagina):
 	if "Trattativa" in oggetto.text():
 		return oggetto.text()
 	prezzo = oggetto.text().split(" ")
-	#if "al mese" in prezzo:
-	#	return prezzo[:-8]
 	return prezzo[1].replace(".","")
 
 def sup(pagina):
@@ -96,9 +94,9 @@ def links(pagina):
 	for a in url("a").items():
 		href = a.attr("href")
 		lista.append(href)
-		# if "http" not in href:
-		# 	if "https://www.tecnocasa.it"+href not in lista:
-		# 		lista.append("https://www.tecnocasa.it"+href)
+		if "http" not in href:
+			if "https://www.tecnocasa.it"+href not in lista:
+				lista.append("https://www.tecnocasa.it"+href)
 	return lista
 
 def nextPage(pagina,indirizzo):
@@ -141,11 +139,6 @@ class Tecnocasa:
 		pers_l.pack()
 		self.pers = ttk.Entry(frame)
 		self.pers.pack()
-		data_pers_l = ttk.Label(frame,wraplength=450, text="A partire dal (GG/MM/AAAA):", padding=[0,10,0,10])
-		data_pers_l.config(background="#d9d9d9")
-		data_pers_l.pack()
-		self.data_pers = ttk.Entry(frame)
-		self.data_pers.pack()
 		the_menu = Menu(frame, tearoff=0)
 		the_menu.add_command(label="Incolla")
 		self.pers.bind("<Button-3>", show_menu)
@@ -158,7 +151,7 @@ class Tecnocasa:
 	def MagiaPers(self):
 		session = requests.Session()
 		link = self.pers.get()
-		data = self.data_pers.get()
+		data = ""
 		Hp = HomeParsing(1,self.root)
 		Hp.setSession(session)
 		lista = Hp.ExtractAnnunci(link,self.funzione,nextPage,False)

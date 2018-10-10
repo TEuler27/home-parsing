@@ -16,18 +16,21 @@ def upperfirst(x):
 		return ""
 
 def price(pagina):
-
-	oggetto = pagina(".pinfo-price")
-	if "Trattativa" in oggetto.text():
-		return oggetto.text()
-	prezzo = oggetto.text()[2:].replace(".","")
-	if oggetto("a").html() != None:
-		len_testo_eliminare = len(oggetto("a").text())
-		prezzo = prezzo[:-len_testo_eliminare]
-	if "al mese" in prezzo:
-		return prezzo[:-8]
-	else:
-		return prezzo
+	try:
+		oggetto = pagina(".pinfo-price")
+		if "Trattativa" in oggetto.text():
+			return oggetto.text()
+		prezzo = oggetto.text()[2:].replace(".","")
+		if oggetto("a").html() != None:
+			len_testo_eliminare = len(oggetto("a").text())
+			prezzo = prezzo[:-len_testo_eliminare]
+		if "al mese" in prezzo:
+			return prezzo[:-8]
+		else:
+			return prezzo
+	except:
+		import pdb; pdb.set_trace()
+		print(pagina)
 
 def sup(pagina):
 
@@ -67,8 +70,6 @@ def auto(pagina):
 			return li.text()
 	return ""
 
-
-
 def floor(pagina):
 
 	parametro = pagina(".characteristics")
@@ -93,11 +94,6 @@ def agency(pagina):
 		return "Privato"
 	else:
 		return pagina(".name-agency").text().replace("|", " ")
-	# link = pagina(".agency-info")("a").attr("href")
-	# session = requests.Session()
-	# if "http" not in link:
-	# 	link = "https://www.casa.it" + link
-	# pagina_nuova = pq(session.get(link).text)
 
 def description(pagina):
 
@@ -126,7 +122,10 @@ def nextPage(pagina,indirizzo):
 	session = requests.Session()
 	pagina_nuova = pq(session.get(indirizzo_nuovo).text)
 	if pagina_nuova(".no-results").html() == None:
-		return indirizzo_nuovo+"?"+parti[1]
+		if len(parti) > 1:
+			return indirizzo_nuovo+"?"+parti[1]
+		else:
+			return indirizzo_nuovo
 	else:
 		return False
 
@@ -155,7 +154,7 @@ def data(pagina):
 		anno = data_list[2]
 		return giorno+"/"+mese+"/"+anno
 	except:
-		return ""
+		print(pagina)
 
 class Casa:
 
