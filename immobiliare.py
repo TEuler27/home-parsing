@@ -39,8 +39,12 @@ def sup(pagina):
 
 def indirizzo(pagina):
 
-	indirizzo = pagina(".im-address__content")
-	return upperfirst(indirizzo.text())
+	indirizzo = pagina(".pos-relative > span")
+	if len(indirizzo) > 0:
+		return upperfirst(indirizzo.text())
+	else:
+		indirizzo = pagina(".im-address__content")
+		return upperfirst(indirizzo.text())
 
 def room(pagina):
 
