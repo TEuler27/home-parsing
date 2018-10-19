@@ -126,29 +126,12 @@ def links(pagina):
 def nextPage(pagina,indirizzo):
 	bottone = pagina(".pull-right")("li")
 	if bottone("a").eq(0).html()==None:
+		print(pagina)
 		return False
 	if bottone("a").eq(0).hasClass("disabled"):
 		return False
 	else:
-		if "pag=" in indirizzo:
-			pezzi = indirizzo.split("?")
-			pezzi_parametri = pezzi[1].split("&")
-			parametri = {}
-			for pezzo in pezzi_parametri:
-				if len(pezzo.split("=")) > 1:
-					parametri[pezzo.split("=")[0]] = pezzo.split("=")[1]
-				else:
-					parametri[pezzo.split("=")[0]] = ""
-			parametri["pag"] = int(parametri["pag"])
-			parametri["pag"] += 1
-			parametri["pag"] = str(parametri["pag"])
-			link_finale = pezzi[0]+"?"
-			for par in parametri:
-				stringa = par + "=" + parametri[par] + "&"
-				link_finale += stringa
-			return link_finale
-		else:
-			return indirizzo+"&pag=2"
+		return bottone("a").eq(0).attr("href")
 
 def data(pagina):
 	parametro = pagina("dl.col-xs-12")
