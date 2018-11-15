@@ -132,7 +132,6 @@ class HomeParsing(object):
 			pagina = pq(pagina_vergine)
 			lista += funzione(pagina)
 			indirizzo = indirizzo_n
-			print(indirizzo)
 		t.destroy()
 		return lista
 

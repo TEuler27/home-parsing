@@ -150,7 +150,6 @@ def links(pagina):
 def nextPage(pagina,indirizzo):
 	bottone = pagina(".pull-right")("li")
 	if bottone("a").eq(0).html()==None:
-		print(pagina)
 		return False
 	if bottone("a").eq(0).hasClass("disabled"):
 		return False
