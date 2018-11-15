@@ -203,6 +203,6 @@ class Tecnocasa:
 		file.close()
 		for url in lista:
 			print(url)
-			Hp.ExtractData(url,nomefile,self.funzioni,False,data)
+			Hp.ExtractData(url,nomefile,funzioni,False,data)
 			self.bar.step()
 		t.destroy()

@@ -242,9 +242,9 @@ class Idealista:
 		file.close()
 		for n in range(len(lista)):
 			if n != 0:
-				Hp.ExtractData(lista[n],nomefile,self.funzioni,lista[n-1])
+				Hp.ExtractData(lista[n],nomefile,funzioni,lista[n-1])
 			else:
-				Hp.ExtractData(lista[n],nomefile,self.funzioni,False)
+				Hp.ExtractData(lista[n],nomefile,funzioni,False)
 			self.bar.step()
 		t.destroy()
 
