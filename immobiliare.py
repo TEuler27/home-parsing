@@ -252,6 +252,6 @@ class Immobiliare:
 		file.write(legenda+"\n")
 		file.close()
 		for url in lista:
-			Hp.ExtractData(url,nomefile,self.funzioni,False,data)
+			Hp.ExtractData(url,nomefile,funzioni,False,data)
 			self.bar.step()
 		t.destroy()
