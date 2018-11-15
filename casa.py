@@ -15,6 +15,30 @@ def upperfirst(x):
 	else:
 		return ""
 
+def empty(pagina):
+	return ""
+
+def tot_spese(pagina):
+	return "=ARROTONDA(INDIRETTO(\"B\"&RIF.RIGA())+INDIRETTO(\"C\"&RIF.RIGA());2)"
+
+def incasso(pagina):
+	return "=ARROTONDA(INDIRETTO(\"E\"&RIF.RIGA())*INDIRETTO(\"M\"&RIF.RIGA());2)"
+
+def utile(pagina):
+	return "=ARROTONDA(INDIRETTO(\"F\"&RIF.RIGA())-INDIRETTO(\"D\"&RIF.RIGA());2)"
+
+def stanze_utile(pagina):
+	return "=ARROTONDA((INDIRETTO(\"H\"&RIF.RIGA())+INDIRETTO(\"D\"&RIF.RIGA()))/INDIRETTO(\"E\"&RIF.RIGA());2)"
+
+def diff_locali(pagina):
+	return "=ARROTONDA(INDIRETTO(\"I\"&RIF.RIGA())-INDIRETTO(\"M\"&RIF.RIGA());2)"
+
+def affitto_mq(pagina):
+	return "=ARROTONDA(INDIRETTO(\"B\"&RIF.RIGA())/INDIRETTO(\"L\"&RIF.RIGA());2)"
+
+def costo_mq(pagina):
+	return "=ARROTONDA(INDIRETTO(\"C\"&RIF.RIGA())/INDIRETTO(\"D\"&RIF.RIGA());2)"
+
 def price(pagina):
 	try:
 		oggetto = pagina(".pinfo-price")
@@ -30,7 +54,6 @@ def price(pagina):
 			return prezzo
 	except:
 		import pdb; pdb.set_trace()
-		print(pagina)
 
 def sup(pagina):
 
@@ -103,7 +126,7 @@ def description(pagina):
 
 def links(pagina):
 
-	url = pagina(".listing-list > li")
+	url = pagina("article")("h2")
 	lista = []
 	for a in url("a").items():
 		href = a.attr("href")
@@ -119,20 +142,18 @@ def nextPage(pagina,indirizzo):
 	splitted[len(splitted)-1] = int(splitted[len(splitted)-1]) + 1
 	splitted[len(splitted)-1] = str(splitted[len(splitted)-1])
 	indirizzo_nuovo = "-".join(splitted)
+	if len(parti) > 1:
+		indirizzo_nuovo += "?"+parti[1]
 	session = requests.Session()
 	pagina_nuova = pq(session.get(indirizzo_nuovo).text)
-	if pagina_nuova(".no-results").html() == None:
-		if len(parti) > 1:
-			return indirizzo_nuovo+"?"+parti[1]
-		else:
-			return indirizzo_nuovo
+	if pagina_nuova(".noResults").html() == None:
+		return indirizzo_nuovo
 	else:
 		return False
 
 def data(pagina):
 	try:
 		data_str = pagina(".last-mod").text()[14:]
-		print(data_str)
 		data_list = data_str.split(" ")
 		giorno = data_list[0]
 		if len(giorno) == 1:
@@ -154,13 +175,14 @@ def data(pagina):
 		anno = data_list[2]
 		return giorno+"/"+mese+"/"+anno
 	except:
-		print(pagina)
+		print("boh")
 
 class Casa:
 
 	def __init__(self,root):
 		self.root = root
-		self.funzioni = [data,indirizzo,price,sup,room,wc,auto,floor,cash,agency,description]
+		self.funzioni_affitti = [data,price,cash,tot_spese,empty,incasso,utile,empty,stanze_utile,diff_locali,affitto_mq,sup,room,wc,floor,description]
+		self.funzioni_acquisti = [data,indirizzo,price,sup,costo_mq,room,wc,auto,floor,cash,description]
 		self.funzione = links
 		self.bar = False
 
@@ -216,13 +238,17 @@ class Casa:
 		file = open("opzioni.json","r", encoding="utf-8")
 		preferenze = json.loads(file.read())
 		file.close()
-		nomefile = preferenze["path"]+"Casa-"+time.strftime("%d-%m__%H-%M")+".csv"
-		legenda = "Data annuncio|Zona|Prezzo|Superficie|Locali|Bagni|Box Auto|Piano|Spese condominiali|Agenzia immobiliare|Descrizione|URL"
-		file = open(nomefile,"w", encoding="utf-8")
+		self.nomefile = preferenze["path"]+"Casa-"+time.strftime("%d-%m__%H-%M")+".csv"
+		if "affitti" in link:
+			legenda = "Data annuncio|Affitto|Spese|Tot. Spese|Rivendita|Incasso|Utile|Utile voluto|Stanze per utile voluto|Differenza locali|Affitto mq|Superficie|Locali|Bagni|Piano|Zona|Descrizione|Link"
+			funzioni = self.funzioni_affitti
+		else:
+			legenda = "Data annuncio|Zona|Prezzo|Superficie|Costo mq|Locali|Bagni|Box Auto|Piano|Spese condominiali|Descrizione|URL"
+			funzioni = self.funzioni_acquisti
+		file = open(self.nomefile,"w", encoding="utf-8")
 		file.write(legenda+"\n")
 		file.close()
 		for url in lista:
-			print(url)
-			Hp.ExtractData(url,nomefile,self.funzioni,False,data)
+			Hp.ExtractData(url,self.nomefile,funzioni,False,data)
 			self.bar.step()
 		t.destroy()

@@ -14,6 +14,30 @@ def upperfirst(x):
 	else:
 		return ""
 
+def empty(pagina):
+	return ""
+
+def tot_spese(pagina):
+	return "=ARROTONDA(INDIRETTO(\"A\"&RIF.RIGA())+INDIRETTO(\"B\"&RIF.RIGA());2)"
+
+def incasso(pagina):
+	return "=ARROTONDA(INDIRETTO(\"D\"&RIF.RIGA())*INDIRETTO(\"L\"&RIF.RIGA());2)"
+
+def utile(pagina):
+	return "=ARROTONDA(INDIRETTO(\"E\"&RIF.RIGA())-INDIRETTO(\"C\"&RIF.RIGA());2)"
+
+def stanze_utile(pagina):
+	return "=ARROTONDA((INDIRETTO(\"G\"&RIF.RIGA())+INDIRETTO(\"C\"&RIF.RIGA()))/INDIRETTO(\"E\"&RIF.RIGA());2)"
+
+def diff_locali(pagina):
+	return "=ARROTONDA(INDIRETTO(\"H\"&RIF.RIGA())-INDIRETTO(\"L\"&RIF.RIGA());2)"
+
+def affitto_mq(pagina):
+	return "=ARROTONDA(INDIRETTO(\"A\"&RIF.RIGA())/INDIRETTO(\"K\"&RIF.RIGA());2)"
+
+def costo_mq(pagina):
+	return "=ARROTONDA(INDIRETTO(\"B\"&RIF.RIGA())/INDIRETTO(\"C\"&RIF.RIGA());2)"
+
 def price(pagina):
 
 	oggetto = pagina(".info-data")(".txt-bold").eq(0)
@@ -145,6 +169,8 @@ class Idealista:
 		self.zona = ""
 		self.ven_aff = ""
 		self.funzioni = [geo,price,sup,room,wc,auto,floor,lift,cash,agency,description]
+		self.funzioni_affitti = [price,cash,tot_spese,empty,incasso,utile,empty,stanze_utile,diff_locali,affitto_mq,sup,room,wc,floor,description]
+		self.funzioni_acquisti = [geo,price,sup,costo_mq,room,wc,auto,floor,cash,description]
 		self.funzione = links
 		self.bar = False
 		file = open("opzioni.json","r", encoding="utf-8")
@@ -205,7 +231,12 @@ class Idealista:
 		self.bar = ttk.Progressbar(t,mode = 'determinate', length = "250", maximum = len(lista))
 		self.bar.pack()
 		nomefile = preferenze["path"]+"Idealista-"+time.strftime("%d-%m__%H-%M")+".csv"
-		legenda = "Indirizzo|Prezzo|Superficie|Locali|Bagni|Box Auto|Piano|Ascensore|Spese condominiali|Agenzia immobiliare|Descrizione|URL"
+		if "affitto" in link:
+			legenda = "Affitto|Spese|Tot. Spese|Rivendita|Incasso|Utile|Utile voluto|Stanze per utile voluto|Differenza locali|Affitto mq|Superficie|Locali|Bagni|Piano|Zona|Descrizione|Link"
+			funzioni = self.funzioni_affitti
+		else:
+			legenda = "Zona|Prezzo|Superficie|Costo mq|Locali|Bagni|Box Auto|Piano|Spese condominiali|Descrizione|URL"
+			funzioni = self.funzioni_acquisti
 		file = open(nomefile,"w", encoding="utf-8")
 		file.write(legenda+"\n")
 		file.close()
