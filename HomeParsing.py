@@ -182,6 +182,6 @@ class HomeParsing(object):
 			else:
 				dati += "|" + dato
 		dati += "|" + indirizzo
-		file = open(nome_doc,"a")
+		file = open(nome_doc,"a",errors='replace')
 		file.write(dati+"\n")
 		file.close()
