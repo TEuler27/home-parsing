@@ -27,7 +27,7 @@ def utile(pagina):
 	return "=ARROTONDA(INDIRETTO(\"E\"&RIF.RIGA())-INDIRETTO(\"C\"&RIF.RIGA());2)"
 
 def stanze_utile(pagina):
-	return "=ARROTONDA((INDIRETTO(\"G\"&RIF.RIGA())+INDIRETTO(\"C\"&RIF.RIGA()))/INDIRETTO(\"E\"&RIF.RIGA());2)"
+	return "=ARROTONDA((INDIRETTO(\"G\"&RIF.RIGA())+INDIRETTO(\"C\"&RIF.RIGA()))/INDIRETTO(\"D\"&RIF.RIGA());2)"
 
 def diff_locali(pagina):
 	return "=ARROTONDA(INDIRETTO(\"H\"&RIF.RIGA())-INDIRETTO(\"L\"&RIF.RIGA());2)"
