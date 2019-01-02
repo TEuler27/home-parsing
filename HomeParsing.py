@@ -96,7 +96,7 @@ class HomeParsing(object):
 	def ExtractAnnunci(self,indirizzo,funzione,next,referer):
 		def restart():
 			w.destroy()
-		indirizzo_start = indirizzo
+		indirizzo = indirizzo.replace("[","%5B").replace("]","%5D").replace("{","%7B").replace("}","%7D")
 		t = tk.Toplevel(self.root)
 		t.configure(background="#d9d9d9")
 		t.geometry("350x80")
@@ -111,7 +111,7 @@ class HomeParsing(object):
 		pagina = pq(pagina_vergine)
 		lista = funzione(pagina)
 		while next(pagina,indirizzo) != False:
-			indirizzo_n = next(pagina,indirizzo)
+			indirizzo_n = next(pagina,indirizzo).replace("[","%5B").replace("]","%5D").replace("{","%7B").replace("}","%7D")
 			self.s.headers.update({"referer": indirizzo})
 			req = self.s.get(indirizzo_n)
 			if req.status_code == 403 and "idealista" in indirizzo_n:

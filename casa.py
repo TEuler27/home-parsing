@@ -137,13 +137,19 @@ def links(pagina):
 
 
 def nextPage(pagina,indirizzo):
-	parti = indirizzo.split("?")
-	splitted = parti[0].split("-")
-	splitted[len(splitted)-1] = int(splitted[len(splitted)-1]) + 1
-	splitted[len(splitted)-1] = str(splitted[len(splitted)-1])
-	indirizzo_nuovo = "-".join(splitted)
-	if len(parti) > 1:
-		indirizzo_nuovo += "?"+parti[1]
+	if not "srp" in indirizzo:
+		parti = indirizzo.split("?")
+		splitted = parti[0].split("-")
+		splitted[len(splitted)-1] = int(splitted[len(splitted)-1]) + 1
+		splitted[len(splitted)-1] = str(splitted[len(splitted)-1])
+		indirizzo_nuovo = "-".join(splitted)
+		if len(parti) > 1:
+			indirizzo_nuovo += "?"+parti[1]
+	else:
+		parti = indirizzo.split("?")
+		splitted = parti[1].split("&")
+		splitted[0] = splitted[0].split("=")[0] + "=" + str(int(splitted[0].split("=")[1])+1)
+		indirizzo_nuovo = parti[0]+"?"+"&".join(splitted)
 	session = requests.Session()
 	pagina_nuova = pq(session.get(indirizzo_nuovo).text)
 	if pagina_nuova(".noResults").html() == None:
