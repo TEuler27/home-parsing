@@ -154,7 +154,10 @@ def nextPage(pagina,indirizzo):
 	if bottone("a").eq(0).hasClass("disabled"):
 		return False
 	else:
-		return bottone("a").eq(0).attr("href")
+		indirizzo_nuovo = bottone("a").eq(0).attr("href")
+		if "http" not in indirizzo_nuovo:
+			indirizzo_nuovo = "https://www.immobiliare.it" + indirizzo_nuovo
+		return indirizzo_nuovo
 
 def data(pagina):
 	parametro = pagina("dl.col-xs-12")
