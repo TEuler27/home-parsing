@@ -109,6 +109,9 @@ class HomeParsing(object):
 		req = self.s.get(indirizzo)
 		pagina_vergine = req.text
 		pagina = pq(pagina_vergine)
+		# with open('index.html','w') as f:
+		# 	f.write(pagina_vergine)
+		# return
 		lista = funzione(pagina)
 		while next(pagina,indirizzo) != False:
 			indirizzo_n = next(pagina,indirizzo).replace("[","%5B").replace("]","%5D").replace("{","%7B").replace("}","%7D")

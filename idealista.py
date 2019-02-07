@@ -199,6 +199,9 @@ class Idealista:
 		pers_tit_l = ttk.Label(frame, text="Ricerca personalizzata:", padding=[0,15,0,15], font='Arial 13 bold')
 		pers_tit_l.config(background="#d9d9d9")
 		pers_tit_l.pack()
+		self.type = tk.IntVar()
+		ttk.Radiobutton(frame, text="Affitto", variable=self.type, value=0).pack()
+		ttk.Radiobutton(frame, text="Vendita", variable=self.type, value=1).pack()
 		pers_l = ttk.Label(frame,wraplength=450, text="Per effettuare una ricerca personalizzata fate la ricerca su idealista.it e copiate il link della pagina con gli annunci trovati in questo campo.", padding=[0,10,0,10])
 		pers_l.config(background="#d9d9d9")
 		pers_l.pack()
@@ -231,7 +234,7 @@ class Idealista:
 		self.bar = ttk.Progressbar(t,mode = 'determinate', length = "250", maximum = len(lista))
 		self.bar.pack()
 		nomefile = preferenze["path"]+"Idealista-"+time.strftime("%d-%m__%H-%M")+".csv"
-		if "affitto" in link:
+		if self.type.get() == 0:
 			legenda = "Affitto|Spese|Tot. Spese|Rivendita|Incasso|Utile|Utile voluto|Stanze per utile voluto|Differenza locali|Affitto mq|Superficie|Locali|Bagni|Piano|Zona|Descrizione|Link"
 			funzioni = self.funzioni_affitti
 		else:

@@ -40,20 +40,19 @@ def costo_mq(pagina):
 	return "=ARROTONDA(INDIRETTO(\"C\"&RIF.RIGA())/INDIRETTO(\"D\"&RIF.RIGA());2)"
 
 def price(pagina):
-	try:
-		oggetto = pagina(".pinfo-price")
-		if "Trattativa" in oggetto.text():
-			return oggetto.text()
-		prezzo = oggetto.text()[2:].replace(".","")
-		if oggetto("a").html() != None:
-			len_testo_eliminare = len(oggetto("a").text())
-			prezzo = prezzo[:-len_testo_eliminare]
-		if "al mese" in prezzo:
-			return prezzo[:-8]
-		else:
-			return prezzo
-	except:
-		import pdb; pdb.set_trace()
+	oggetto = pagina(".pinfo-price")
+	prezzo = oggetto.text()[2:]
+	if "Trattativa" in oggetto.text():
+		return oggetto.text()
+	if oggetto("a").html() != None:
+		len_testo_eliminare = len(oggetto("a").text())
+		prezzo = prezzo[:-len_testo_eliminare]
+	if "al mese" in prezzo:
+		prezzo = prezzo.replace(".","")
+		return prezzo[:-8]
+	else:
+		prezzo = prezzo.replace(".","")
+		return prezzo
 
 def sup(pagina):
 
@@ -137,25 +136,33 @@ def links(pagina):
 
 
 def nextPage(pagina,indirizzo):
-	if not "srp" in indirizzo:
-		parti = indirizzo.split("?")
-		splitted = parti[0].split("-")
-		splitted[len(splitted)-1] = int(splitted[len(splitted)-1]) + 1
-		splitted[len(splitted)-1] = str(splitted[len(splitted)-1])
-		indirizzo_nuovo = "-".join(splitted)
-		if len(parti) > 1:
-			indirizzo_nuovo += "?"+parti[1]
-	else:
-		parti = indirizzo.split("?")
-		splitted = parti[1].split("&")
-		splitted[0] = splitted[0].split("=")[0] + "=" + str(int(splitted[0].split("=")[1])+1)
-		indirizzo_nuovo = parti[0]+"?"+"&".join(splitted)
-	session = requests.Session()
-	pagina_nuova = pq(session.get(indirizzo_nuovo).text)
-	if pagina_nuova(".noResults").html() == None:
-		return indirizzo_nuovo
-	else:
-		return False
+	for link in pagina("link").items():
+		if link.attr("rel") == "next":
+			href = link.attr("href")
+			if "http" not in href:
+				return "https://www.casa.it"+href
+			else:
+				return href
+	return False
+	# if not "srp" in indirizzo:
+	# 	parti = indirizzo.split("?")
+	# 	splitted = parti[0].split("-")
+	# 	splitted[len(splitted)-1] = int(splitted[len(splitted)-1]) + 1
+	# 	splitted[len(splitted)-1] = str(splitted[len(splitted)-1])
+	# 	indirizzo_nuovo = "-".join(splitted)
+	# 	if len(parti) > 1:
+	# 		indirizzo_nuovo += "?"+parti[1]
+	# else:
+	# 	parti = indirizzo.split("?")
+	# 	splitted = parti[1].split("&")
+	# 	splitted[0] = splitted[0].split("=")[0] + "=" + str(int(splitted[0].split("=")[1])+1)
+	# 	indirizzo_nuovo = parti[0]+"?"+"&".join(splitted)
+	# session = requests.Session()
+	# pagina_nuova = pq(session.get(indirizzo_nuovo).text)
+	# if pagina_nuova(".noResults").html() == None:
+	# 	return indirizzo_nuovo
+	# else:
+	# 	return False
 
 def data(pagina):
 	try:
@@ -208,6 +215,9 @@ class Casa:
 		pers_tit_l = ttk.Label(frame, text="Ricerca personalizzata:", padding=[0,15,0,15], font='Arial 13 bold')
 		pers_tit_l.config(background="#d9d9d9")
 		pers_tit_l.pack()
+		self.type = tk.IntVar()
+		ttk.Radiobutton(frame, text="Affitto", variable=self.type, value=0).pack()
+		ttk.Radiobutton(frame, text="Vendita", variable=self.type, value=1).pack()
 		pers_l = ttk.Label(frame,wraplength=450, text="Per effettuare una ricerca personalizzata fate la ricerca su casa.it e copiate il link della pagina con gli annunci trovati in questo campo.", padding=[0,10,0,10])
 		pers_l.config(background="#d9d9d9")
 		pers_l.pack()
@@ -245,7 +255,7 @@ class Casa:
 		preferenze = json.loads(file.read())
 		file.close()
 		self.nomefile = preferenze["path"]+"Casa-"+time.strftime("%d-%m__%H-%M")+".csv"
-		if "affitti" in link:
+		if self.type.get() == 0:
 			legenda = "Data annuncio|Affitto|Spese|Tot. Spese|Rivendita|Incasso|Utile|Utile voluto|Stanze per utile voluto|Differenza locali|Affitto mq|Superficie|Locali|Bagni|Piano|Zona|Descrizione|Link"
 			funzioni = self.funzioni_affitti
 		else:
