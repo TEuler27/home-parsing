@@ -125,7 +125,7 @@ def description(pagina):
 
 def links(pagina):
 
-	url = pagina("article")("h2")
+	url = pagina("article")(".casaAdTitle")
 	lista = []
 	for a in url("a").items():
 		href = a.attr("href")
@@ -244,6 +244,7 @@ class Casa:
 		Hp = HomeParsing(1,self.root)
 		Hp.setSession(session)
 		lista = Hp.ExtractAnnunci(link,self.funzione,nextPage,False)
+		print(lista)
 		t = tk.Toplevel(self.root,background="#d9d9d9")
 		t.geometry("350x80")
 		label = ttk.Label(t,text="Scaricamento in corso dei dati, attendere prego",padding = [0,10,0,10])
